@@ -1,10 +1,18 @@
+#' Create Design conditions
+#'
+#' @param design
+#'
+#' @return A data frame
+#' @export
 create_template <- function(design){
-  template <- expand.grid(design[['manipulations']])
-  template$id <- 1
+  # Cross all of our conditions
+  conditions <- expand.grid(design[['manipulations']])
+  conditions$id <- 1 # for joining
 
-  trials <- stimulus_table(design)
+  # Create trial information for each condition
+  trials <- get_stim_table(design)
 
-  template <- left_join(template, trials, by = 'id')
+  template <- left_join(conditions, trials, by = 'id')
   template$id <- NULL
   template <- set_filepaths(design, template)
   template

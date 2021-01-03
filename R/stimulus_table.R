@@ -1,4 +1,13 @@
-stimulus_table <- function(design, add_id=T){
+#' Create table for stimuli
+#'
+#' @param design
+#' @param add_id
+#'
+#' @return
+#' @export
+#'
+#' @examples
+get_stim_table <- function(design, add_id=T){
   out <-
     rbindlist(
       lmap(
@@ -8,6 +17,6 @@ stimulus_table <- function(design, add_id=T){
       )
     )
   out$trial <- 1:nrow(out)
-  if(add_id) out$id <- 1
+  if (add_id) out$id <- 1
   out
 }

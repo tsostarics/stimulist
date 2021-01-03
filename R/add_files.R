@@ -1,3 +1,17 @@
+#' Add filepath information
+#'
+#' @param .data Experiment Design
+#' @param directory Directory the files will be held in
+#' @param prefix Prefix to give all files
+#' @param prefix_by Prefix by a particular condition
+#' @param suffix Suffix to give all files
+#' @param sufix_by Suffix by a particular condition
+#' @param extension File extension of files
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_files <- function(.data,
                       directory = './',
                       prefix = NA,

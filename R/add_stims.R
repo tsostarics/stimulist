@@ -1,11 +1,21 @@
+#' Add Stimuli to Design
+#'
+#' @param .data
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
 add_stims <- function(.data,
                       ...){
   stims <- enquos(...)
 
-  if (length(stims) == 0) { # Placeholder names
+  # If using placeholders
+  if (length(stims) == 0) {
     .data[['stimuli']] <-
       lmap(.data[['trials']],
-           function(x) setNames(list(1:x[[1L]]), names(x)))
+           function(x) setNames(list(1:x[[1L]]), names(x)))# starts each stim group at 1, might be okay though, we'll see
     attr(.data[['stimuli']], 'placeholder') <- TRUE
     return(.data)
   }

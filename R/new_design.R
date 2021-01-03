@@ -1,3 +1,9 @@
+#' Create new design
+#'
+#' @return
+#' @export
+#'
+#' @examples
 new_design <- function(){
   design <-
     list(
