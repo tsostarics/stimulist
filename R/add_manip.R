@@ -1,13 +1,16 @@
 #' Add Experimental Manipulations
 #'
-#' @param .data
+#' @param design
 #' @param ...
 #'
 #' @return
 #' @export
 #'
 #' @examples
-add_manip <- function(.data, ...){
-  .data[['manipulations']] <-  list(...)
-  .data
+add_manipulations <- function(design, ...){
+  design[['manipulations']] <-  list(...)
+  for (i in 1:length(design[['manipulations']])) {
+    attr(design[['manipulations']][[i]], 'ordering') <- FALSE
+  }
+  design
 }

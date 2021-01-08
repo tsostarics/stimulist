@@ -1,14 +1,14 @@
 #' Add trials to experiment design
 #'
-#' @param .data
+#' @param design
 #' @param ...
 #'
 #' @return
 #' @export
 #'
 #' @examples
-add_trials <- function(.data, ...){
-  .data[['trials']] <- list(...)
-  attributes(.data[['trials']])$total <- sum(unlist(.data[['trials']]))
-  .data
+add_trials <- function(design, ...){
+  design[['trials']] <- list(...)
+  attributes(design[['trials']])$total <- sum(unlist(design[['trials']]))
+  design
 }

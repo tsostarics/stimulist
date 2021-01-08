@@ -1,6 +1,6 @@
 #' Add filepath information
 #'
-#' @param .data Experiment Design
+#' @param design Experiment Design
 #' @param directory Directory the files will be held in
 #' @param prefix Prefix to give all files
 #' @param prefix_by Prefix by a particular condition
@@ -12,20 +12,20 @@
 #' @export
 #'
 #' @examples
-add_files <- function(.data,
+add_files <- function(design,
                       directory = './',
                       prefix = NA,
                       prefix_by = NA,
                       suffix = NA,
                       sufix_by = NA,
                       extension = ''){
-  if (attr(.data$stimuli, 'placeholder'))
+  if (attr(design$stimuli, 'placeholder'))
     message("Placeholder stimuli values are in use, be careful using these filepaths")
 
   listcall <- match.call()
   listcall[[1L]] <- quote(list)
   listcall[[2L]] <- NULL
 
-  .data[['files']] <- eval(listcall)
-  .data
+  design[['files']] <- eval(listcall)
+  design
 }
