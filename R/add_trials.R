@@ -9,6 +9,10 @@
 #' @examples
 add_trials <- function(design, ...){
   design[['trials']] <- list(...)
-  attributes(design[['trials']])$total <- sum(unlist(design[['trials']]))
+  attr(design[['trials']], 'total') <- sum(unlist(design[['trials']]))
+  for (i in 1:length(design[['trials']])){
+    attr(design[['trials']][[i]], 'labels') <- ''
+    attr(design[['trials']][[i]], 'labelled') <- FALSE
+  }
   design
 }

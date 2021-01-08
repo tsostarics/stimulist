@@ -30,6 +30,7 @@ present_n_of <- function(design, manipulation, n){
   names(perm_matrix) <- choice_names
 
   # Retain the original info of the manipulation, but set the new ordering
-  attr(design[['manipulations']][[manipulation]], 'ordering') <- perm_matrix
+  design[['orderings']][[manipulation]] <- perm_matrix
+  attr(design[['manipulations']][[manipulation]], 'has_order') <- TRUE
   design
 }

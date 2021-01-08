@@ -43,9 +43,10 @@ add_stimuli_by <- function(design, ...){
 
              ## Get columns to add from rhs of formula
              add_cols <- strsplit(as.character(x[[3L]]), " \\+ ")[[1L]]
-             ordering <- attr(design[['manipulations']][[f_manip]], 'ordering')
+             has_order <- attr(design[['manipulations']][[f_manip]], 'has_order')
 
-             if (!isFALSE(ordering)) {
+             if (has_order) {
+               ordering <- design[['orderings']][[f_manip]]
                order_nums <- 1:length(ordering)
                add_cols <-
                  as.vector(
@@ -65,11 +66,13 @@ add_stimuli_by <- function(design, ...){
                relocate(trial, type, stimulus) %>%
                cbind(add_cols)
 
-             setNames(list(output), f_manip)
+             output <- setNames(list(output), f_manip)
+             output
            }
          }
     )
   # Add stimulus skeletons to our design
+  print(skeleton_list)
   design[['stimuli']] <- skeleton_list
   design
 }
@@ -78,10 +81,10 @@ add_stimuli_by <- function(design, ...){
 .expand_manipulation <- function(design, manip, trials_n){
   ordered_manips <-  vapply(design[['manipulations']],
                             FUN = function(x)
-                              !isFALSE(attr(x,'ordering')),
+                              attr(x,'has_order'),
                             FUN.VALUE = TRUE)
   if (ordered_manips[manip]) {
-    ordering <- attr(design[['manipulations']][[manip]], 'ordering')
+    ordering <- design[['orderings']][[manip]]
     ordering <- mutate(ordering, set = row_number())
     trials_df <- expand.grid(trial = 1:trials_n, set = 1:nrow(ordering))
     expanded <- left_join(trials_df, ordering, by = 'set')

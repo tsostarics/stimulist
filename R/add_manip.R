@@ -10,7 +10,7 @@
 add_manipulations <- function(design, ...){
   design[['manipulations']] <-  list(...)
   for (i in 1:length(design[['manipulations']])) {
-    attr(design[['manipulations']][[i]], 'ordering') <- FALSE
+    attr(design[['manipulations']][[i]], 'has_order') <- FALSE
   }
   design
 }

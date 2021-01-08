@@ -10,6 +10,7 @@ new_design <- function(){
       manipulations = list(),
       trials = list(),
       stimuli = list(),
+      orderings = list(),
       counterbalance = NA
     )
   attr(design$trials, 'total') <- 0
