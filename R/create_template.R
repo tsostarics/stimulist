@@ -7,6 +7,7 @@
 create_template <- function(design){
   # Cross all of our conditions
   conditions <- expand.grid(design[['manipulations']])
+  # gr %>% as_tibble() %>% unnest(cols=contour)
   conditions$id <- 1 # for joining
 
   # Create trial information for each condition

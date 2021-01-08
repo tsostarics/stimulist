@@ -16,9 +16,9 @@ set_filepaths <- function(design, template, name_by = 'stimulus'){
 
   # Create a paste call, exclude any feeatures that weren't specified
   paste_call <- quote(paste(prefix,
-                            .data[[prefix_by]],
-                            .data[[name_by]],
-                            .data[[sufix_by]],
+                            design[[prefix_by]],
+                            design[[name_by]],
+                            design[[sufix_by]],
                             suffix,
                             sep = '_'))
   paste_call <- paste_call[c(T, file_keep)]

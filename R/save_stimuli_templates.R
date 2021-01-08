@@ -4,14 +4,14 @@
 #' you to fill in in excel. The completed files will be read in later to merge
 #' into one large table that can be counterbalanced into different lists.
 #'
-#' @param .data A design
+#' @param design A design
 #'
 #' @return
 #' @export
 #'
 #' @examples
-save_stimuli_templates <- function(.data){
-  template <- .data[['stimuli']]
+save_stimuli_templates <- function(design){
+  template <- design[['stimuli']]
   filenames <- names(template)
   for (i in 1:length(template)) {
     this_file <- paste0(filenames[i], '.csv')
