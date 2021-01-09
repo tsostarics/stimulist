@@ -36,15 +36,33 @@ add_stimuli_by <- function(design, ...){
       # For stimuli that vary by a manipulation (manip ~ x + y + z...)
       # Get the manipulation name, cross by number of trials, set name
       f_manip <- stimset[[2L]] # Manipulation from lhs of formula
-
+      is_crossed <- grepl(' \\* ', f_manip)
       ## Get columns to add from rhs of formula
       f_cols <- strsplit(as.character(stimset[[3L]]), " \\+ ")[[1L]]
 
-      # Cross manipulation conditions with number of trials
-      manipulation <- design[['manipulations']][[f_manip]]
-      expanded <- expand.grid(manipulation, trial = 1:n_trials)
-      names(expanded)[1L] <- f_manip # expand.grid first column name is `Var1`
+      #### For doing crossed manipulations
+      if (is_crossed) {
+        # Extract the crossed manipulations
+        f_manips <- strsplit(f_manip, " \\* ")[[1]]
 
+        # Compose an expand.grid call with all the crossed manipulations
+        eg_call <- list(quote(expand.grid))
+        for (i in 1:length(f_manips)) {
+          eg_call[[i + 1L]] <- design[['manipulations']][[f_manips[i]]]
+        }
+        eg_call[[i + 2L]] <- 1:n_trials
+
+        expanded <- eval(as.call(eg_call))
+        names(expanded) <- c(f_manips, 'trial')
+        print(expanded)
+        f_manip <- gsub(' \\* ', ' x ', f_manip) # change * to x for filenames
+        ####
+      } else{
+        # Cross manipulation conditions with number of trials
+        manipulation <- design[['manipulations']][[f_manip]]
+        expanded <- expand.grid(manipulation, trial = 1:n_trials)
+        names(expanded)[1L] <- f_manip # expand.grid first column name is `Var1`
+      }
       # Make empty singleton columns to bind to output
       add_cols <- set_names(as.list(rep(NA, length(f_cols))), f_cols)
 
@@ -56,6 +74,9 @@ add_stimuli_by <- function(design, ...){
       # If there's an ordering, then make a presentation using the different
       # permutations of that condition. Otherwise the presentation is the same
       # as the stimulus set.
+      if (is_crossed)
+        design[['presentations']][[f_manip]] <- output
+      else {
       has_order <- attr(manipulation, 'has_order')
       if (has_order)
         design[['presentations']][[f_manip]] <- .make_presentation(design,
@@ -65,6 +86,7 @@ add_stimuli_by <- function(design, ...){
                                                                    stim_table)
       else
         design[['presentations']][[f_manip]] <- output
+      }
 
       design[['stimuli']][[f_manip]] <- output
     }
