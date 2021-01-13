@@ -71,24 +71,21 @@ add_stimuli_by <- function(design, ...){
         relocate(trial, type, stimulus) %>%
         cbind(add_cols)
 
+      design[['stimuli']][[f_manip]] <- output
+
+      output$trial <- 1:nrow(output) # might need to remove this later
       # If there's an ordering, then make a presentation using the different
       # permutations of that condition. Otherwise the presentation is the same
       # as the stimulus set.
-      if (is_crossed)
-        design[['presentations']][[f_manip]] <- output
-      else {
-      has_order <- attr(manipulation, 'has_order')
-      if (has_order)
-        design[['presentations']][[f_manip]] <- .make_presentation(design,
-                                                                   f_manip,
-                                                                   n_trials,
-                                                                   f_cols,
-                                                                   stim_table)
-      else
-        design[['presentations']][[f_manip]] <- output
-      }
-
-      design[['stimuli']][[f_manip]] <- output
+      if (!is_crossed) {
+        has_order <- attr(manipulation, 'has_order')
+        if (has_order)
+          design[['presentations']][[f_manip]] <- .make_presentation(design,
+                                                                     f_manip,
+                                                                     n_trials,
+                                                                     f_cols,
+                                                                     stim_table)
+      } else design[['presentations']][[f_manip]] <- output
     }
   }
   design
@@ -123,8 +120,10 @@ add_stimuli_by <- function(design, ...){
 }
 
 .make_presentation <- function(design, manipulation, n, columns, stimulus_table){
+  # Extract ordering for this manipulation, and get the number to present
   ordering <- design[['orderings']][[manipulation]]
   order_nums <- 1:length(ordering)
+  # For each of the columns to add, append 1:order_nums
   add_cols <-
     as.vector(
       sapply(columns,
@@ -134,12 +133,12 @@ add_stimuli_by <- function(design, ...){
 
   expanded <- .expand_ordering(design, manipulation, n)
 
-  add_cols <- set_names(as.list(rep(NA, length(columns))), columns)
+  # Turn the vector of columns to add into a named list for cbind
+  add_cols <- set_names(as.list(rep(NA, length(add_cols))), add_cols)
 
   output <-
     left_join(expanded, stimulus_table, by = 'trial') %>%
     relocate(trial, type, stimulus) %>%
     cbind(add_cols)
-
   output
 }
