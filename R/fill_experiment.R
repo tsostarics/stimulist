@@ -20,11 +20,12 @@ fill_experiment <- function(design){
         merge(x,y, all = F),
         design[['presentations']]
       ),
-      # by = 'tojoin',
       all = F,
       allow.cartesian = T
     )
   expanded$tojoin <- NULL
+
+  # If counterbalance is specified, add to the expanded table
   if (any(!is.na(design[['counterbalance']])))
     expanded$counterbalance <- design[['counterbalance']]
 

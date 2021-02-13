@@ -4,7 +4,7 @@
 \alias{save_stimuli_templates}
 \title{Save stimuli templates}
 \usage{
-save_stimuli_templates(design)
+save_stimuli_templates(design, as_workbook = TRUE)
 }
 \arguments{
 \item{design}{A design}

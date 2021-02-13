@@ -18,21 +18,23 @@ counterbalance <- function(design, method = "latinsquare"){
   design
 }
 
-
+# Get the number of lists we need to make while preventing double counting
+# when incorporating crossed manipulations
 .calculate_lists <- function(design){
   presentations <- names(design[['presentations']])
   crossed_presentations <- presentations[grepl(' x ', presentations)]
-  manips_to_check <- c(str_split(crossed_presentations, " x ")[[1]], 'constant_for_all')
+  manips_to_check <- c(str_split(crossed_presentations, " x ")[[1]],
+                       'constant_for_all')
   reduced_presentations <- presentations[!presentations %in% manips_to_check]
 
   prod(vapply(design[['presentations']][reduced_presentations], nrow, 1L))
 }
 
+# Creates latin square list assignments
 .assign_latinsquare <- function(design){
   n_trials <- attr(design[['trials']], 'total')
   n_lists <- .calculate_lists(design)
-  print(n_trials)
-  print(n_lists)
+
   assignments <- purrr::list_along(1:n_trials)
   ls_order <- 1:n_lists
   mod_n <- n_lists + 1

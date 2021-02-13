@@ -10,19 +10,26 @@
 #' @export
 #'
 #' @examples
-save_stimuli_templates <- function(design){
+save_stimuli_templates <- function(design, as_workbook = TRUE){
   stimuli <- design[['stimuli']]
   filenames <- names(stimuli)
-  for (i in 1:length(stimuli)) {
-    this_file <- paste0(filenames[i], '.csv')
-    to_write <-
-      dplyr::select(
-        dplyr::left_join(get_stim_table(design), stimuli[[i]]),
-        -tojoin
-        )
-    write.csv(to_write, file = this_file, row.names = FALSE, na = '')
-  }
 
-  message(".csv files have been written for: ",
-          paste(filenames, collapse = ", "))
+  if (as_workbook) {
+    wb = xlsx::createWorkbook()
+    for (i in 1:length(stimuli)) {
+      sheet = xlsx::createSheet(wb, filenames[i])
+      to_write <-  merge(get_stim_table(design), stimuli[[i]], all = F, allow.cartesian = T) ## change to merge later
+      to_write$tojoin <- NULL
+      xlsx::addDataFrame(to_write, sheet = sheet, row.names = FALSE)
+    }
+    xlsx::saveWorkbook(wb, "experiment_stimuli.xlsx")
+    message("An excel workbook has been saved with sheets for each stimulus component.")
+  } else {
+    for (i in 1:length(stimuli)) {
+      this_file <- paste0(filenames[i], '.csv')
+      write.csv(to_write, file = this_file, row.names = FALSE, na = '')
+    }
+    message(".csv files have been written for: ",
+            paste(filenames, collapse = ", "))
+  }
 }

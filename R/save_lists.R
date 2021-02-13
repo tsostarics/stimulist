@@ -6,13 +6,18 @@
 #'
 #' @param design
 #' @param filename
-#' @param path
+#' @param separate_trials
 #'
 #' @return
 #' @export
 #'
 #' @examples
-save_lists <- function(design, filename="experiment", path=getwd()){
+save_lists <- function(design,
+                       filename="experiment",
+                       path = getwd(),
+                       separate_trials = FALSE,
+                       as_one_file = FALSE){
+  # Error handling
   if (!'complete_experiment' %in% names(design))
     stop("Please use fill_experiment() before trying to save lists")
   if (!'counterbalance' %in% names(design[['complete_experiment']])) {
@@ -21,17 +26,39 @@ save_lists <- function(design, filename="experiment", path=getwd()){
     return(NULL)
   }
 
-  lists <- dplyr::group_split(
-    dplyr::group_by(
-      design[['complete_experiment']],
-      counterbalance
-    )
-  )
+  if (as_one_file) {
+    write.csv(design[['complete_experiment']],
+              "stimulus_list.csv",
+              row.names = F)
+    message("Wrote 1 .csv file with all stimuli successfully.")
+    return(NULL)
+  }
 
-  for (i in 1:length(lists)) {
+  groups <- "counterbalance"
+  if (separate_trials) groups <- c(groups, 'type')
+
+  lists <-
+    dplyr::group_split(
+      dplyr::group_by(
+        design[['complete_experiment']],
+        !!!syms(groups)
+      )
+    )
+
+  n_types <- length(unique(design[['complete_experiment']][['type']]))
+  n_lists <- length(lists)
+  file_labels <- 1:n_lists
+  if (separate_trials)
+    file_labels <- ceiling(file_labels / n_types) # Allows for better numbering
+
+  for (i in 1:n_lists) {
     current_list <- lists[[i]]
+    trial_type <- ifelse(separate_trials, current_list[['type']][[1L]], '')
+
+    # note: maybe there should be a check to see if the / is included. getwd
+    # doesn't include it but a user might provide it manually.
     write.csv(current_list,
-              paste0(path, "/", filename,"_",i, ".csv"),
+              paste0(path, "/",trial_type, "_", filename,"_",file_labels[i], ".csv"),
               na = "",
               row.names = F)
   }
