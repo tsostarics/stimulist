@@ -17,6 +17,6 @@ get_stim_table <- function(design, add_id=T){
       )
     )
   out$trial <- 1:nrow(out)
-  if (add_id) out$id <- 1
+  if (add_id) out$tojoin <- 1
   out
 }

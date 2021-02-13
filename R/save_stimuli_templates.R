@@ -11,11 +11,16 @@
 #'
 #' @examples
 save_stimuli_templates <- function(design){
-  template <- design[['stimuli']]
-  filenames <- names(template)
-  for (i in 1:length(template)) {
+  stimuli <- design[['stimuli']]
+  filenames <- names(stimuli)
+  for (i in 1:length(stimuli)) {
     this_file <- paste0(filenames[i], '.csv')
-    write.csv(template[[i]], file = this_file, row.names = FALSE, na = '')
+    to_write <-
+      dplyr::select(
+        dplyr::left_join(get_stim_table(design), stimuli[[i]]),
+        -tojoin
+        )
+    write.csv(to_write, file = this_file, row.names = FALSE, na = '')
   }
 
   message(".csv files have been written for: ",
