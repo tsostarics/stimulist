@@ -4,7 +4,7 @@
 #' @export
 #'
 #' @examples
-new_design <- function(){
+new_design <- function(name = "Experiment"){
   design <-
     list(
       manipulations = list(),
@@ -12,9 +12,18 @@ new_design <- function(){
       stimuli = list(),
       orderings = list(),
       presentations = list(),
-      counterbalance = NA
+      counterbalance = NA,
+      name = name
     )
+  attr(design$manipulations, 'printmsg') <- 'No manipulations set yet.\n'
+  attr(design$trials, 'printmsg') <- 'No trials set yet.\n'
+  attr(design$stimuli, 'printmsg') <- 'No stimuli set yet.\n'
+  attr(design$orderings, 'printmsg') <- 'No orderings set yet.\n'
+  attr(design$presentations, 'printmsg') <- 'No presentations set yet.\n'
+  attr(design$counterbalance, 'printmsg') <- 'No counterbalancing set yet.\n'
+  attr(design$name, 'printmsg') <- paste0('Experiment Name: ', name, "\n")
   attr(design$trials, 'total') <- 0
   attr(design$stimuli, 'placeholder') <- TRUE
+  class(design) <- 'stimulist'
   design
 }

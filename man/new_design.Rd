@@ -4,7 +4,7 @@
 \alias{new_design}
 \title{Create new design}
 \usage{
-new_design()
+new_design(name = "Experiment")
 }
 \value{
 

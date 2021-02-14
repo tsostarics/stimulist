@@ -31,6 +31,7 @@ add_stimuli_by <- function(design, ...){
       output <- cbind(data.frame(tojoin = 1), add_cols)
       design[['stimuli']][['constant_for_all']] <- output
       design[['presentations']][['constant_for_all']] <- output
+      design <- .set_stimulus_printmsg(design, 'constant_for_all', f_cols)
     }
     else{
       # For stimuli that vary by a manipulation (manip ~ x + y + z...)
@@ -64,8 +65,59 @@ add_stimuli_by <- function(design, ...){
         else
           design[['presentations']][[f_manip]] <- output
       }
+      design <- .set_stimulus_printmsg(design, f_manip, f_cols, is_crossed)
     }
   }
+  .set_stimuli_printmsg(design)
+}
+
+.set_stimuli_printmsg <- function(design){
+  new_printmsg <- "Each trial presents these stimuli:\n"
+  for (i in 1:length(design$stimuli)) {
+    new_printmsg <- paste0(new_printmsg, attr(design$stimuli[[i]], 'printmsg'))
+  }
+  attr(design$stimuli, 'printmsg') <- new_printmsg
+  design
+}
+
+.set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE){
+  if (stimulus == 'constant_for_all') {
+    new_printmsg <- paste0("  1 of ",
+                           to_add,
+                           ", which is held constant across all trials.\n",
+                           collapse = '')
+  }
+  else  {
+    if (is_crossed)
+      stimstring <- gsub(" x ", " and ", stimulus)
+    else
+      stimstring <- stimulus
+
+    lookup <- strsplit(stimulus, " x ")[[1]]
+    is_ordered <-
+      vapply(lookup,
+             function(x)
+               attr(design[['manipulations']][[x]], 'has_order'),
+             TRUE
+      )
+    n <-
+      prod(
+        vapply(
+          lookup[is_ordered],
+          function(x) length(design[['orderings']][[x]]),
+          1L
+        )
+      )
+    new_printmsg <- paste0("  ",
+                           n,
+                           " of ",
+                           to_add,
+                           ", which varies by ",
+                           stimstring,
+                           ".\n",
+                           collapse = '')
+  }
+  attr(design[['stimuli']][[stimulus]], 'printmsg') <- new_printmsg
   design
 }
 

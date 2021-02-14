@@ -32,5 +32,7 @@ present_n_of <- function(design, manipulation, n){
   # Retain the original info of the manipulation, but set the new ordering
   design[['orderings']][[manipulation]] <- perm_matrix
   attr(design[['manipulations']][[manipulation]], 'has_order') <- TRUE
+  attr(design[['orderings']][[manipulation]], 'r') <- n
+  attr(design[['orderings']][[manipulation]], 'n') <- length(design[['manipulations']][[manipulation]])
   design
 }

@@ -15,19 +15,48 @@
 #' @examples
 counterbalance <- function(design, method = "latinsquare"){
   design[['counterbalance']] <- .assign_latinsquare(design)
-  design
+  .set_counterbalance_printmsg(design)
 }
 
 # Get the number of lists we need to make while preventing double counting
 # when incorporating crossed manipulations
 .calculate_lists <- function(design){
   presentations <- names(design[['presentations']])
-  crossed_presentations <- presentations[grepl(' x ', presentations)]
-  manips_to_check <- c(str_split(crossed_presentations, " x ")[[1]],
-                       'constant_for_all')
-  reduced_presentations <- presentations[!presentations %in% manips_to_check]
+  any_crossed <- grepl(' x ', presentations)
+  if (any(any_crossed)) {
+    crossed_presentations <- presentations[any_crossed]
+    manips_to_check <- c(str_split(crossed_presentations, " x ")[[1]],
+                         'constant_for_all')
+    reduced_presentations <- presentations[!presentations %in% manips_to_check]
+  }
+  else
+    reduced_presentations <- presentations
 
   prod(vapply(design[['presentations']][reduced_presentations], nrow, 1L))
+}
+
+.set_counterbalance_printmsg <- function(design){
+  n_lists <- max(design[['counterbalance']])
+  new_printmsg <- paste0(n_lists," stimulus lists total, counterbalanced by:\n")
+  for (i in 1:length(design$manipulations)) {
+    if (attr(design[['manipulations']][[i]], 'has_order')) {
+      n = attr(design[['orderings']][[i]], 'n')
+      r = attr(design[['orderings']][[i]], 'r')
+      ps = factorial(n) / factorial(n - r)
+      stimulus <- names(design[['orderings']][i])
+      new_printmsg <- paste0(new_printmsg,"  ", n, "-pick-", r,"=", ps, " permutations of ", stimulus,".\n")
+    }
+    else {
+      n <-  length(design[['manipulations']][[i]])
+      stimulus <- names(design[['manipulations']][i])
+      new_printmsg <- paste0(new_printmsg,"  ", n, " levels of ", stimulus)
+    }
+  }
+  attr(design[['counterbalance']], 'printmsg') <- new_printmsg
+  design
+  # 12 stimulus list total, counterbalanced by:
+  # 2 levels of context
+  # 3-pick-2=6 permutations of contour
 }
 
 # Creates latin square list assignments
