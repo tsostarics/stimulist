@@ -1,0 +1,68 @@
+#' Merge settings from template
+#'
+#' After using save_stimulus_template() to create a blank excel workbook, you
+#' can then fill it out with whatever file names or text you need. But,
+#' you'll probably want to load that back into the design you made so you can
+#' save counterbalanced lists of what you created. This function will fill in
+#' any empty columns in the complete_experiment table with what you put into
+#' the blank template file. The function will automatically handle cases where
+#' you have permutations of orders.
+#'
+#' @param design
+#' @param template_path
+#'
+#' @return
+#' @export
+#'
+#' @examples
+merge_template <- function(design, template_path){
+  all_stimuli <- design[['complete_experiment']]
+  template_sheets <- .read_template(template_path)
+
+  # Get the columns we need to fill, and what we're going to merge by
+  to_fill <- .get_fillable(all_stimuli)
+  to_fill <- to_fill[unlist(to_fill)]
+  merge_keys <- names(select(all_stimuli, !contains(names(to_fill))))
+
+  for (i in 1:length(template_sheets)) {
+    sheet <- template_sheets[[i]]
+    sheet_cols <- names(sheet)
+    # This value(s) will need to be excluded from the stimuli table for joining
+    exclude_var <- names(select(to_fill, contains(sheet_cols)))
+
+    if (length(exclude_var) == 1){
+      all_stimuli <- merge(select(all_stimuli, !contains(exclude_var)), sheet)
+    } else {
+      # We need to join the same column on different key columns to handle
+      # instances where present_n_of() has been used.
+      template_value <- str_match(exclude_var[1L], "^(.+)_\\d$")[[2]]
+      template_key <- sheet_cols[(!sheet_cols %in% merge_keys) & (!sheet_cols == template_value)]
+      table_keys <- names(select(all_stimuli, contains(depend_var)))
+      for (j in 1:length(exclude_var)) {
+        sheet[exclude_var[j]] <- sheet[template_value]
+        sheet[table_keys[j]] <- sheet[template_key]
+        all_stimuli <- merge(select(sheet, -all_of(c(template_key, template_value))),
+                             select(all_stimuli, !contains(exclude_var[j])))
+        sheet[exclude_var[j]] <- NULL
+        sheet[table_keys[j]] <- NULL
+      }
+    }
+  }
+  design[['complete_experiment']] <- all_stimuli
+  design
+}
+
+.get_fillable <- function(filled_table){
+  filled_table %>%
+    summarize(across(everything(), function(x) first(is.na(x))))
+}
+
+.read_template <- function(template_path){
+  sheets <- xlsx::loadWorkbook("experiment_stimuli.xlsx") %>% xlsx::getSheets()
+  sheet_names <- names(sheets)
+  rm(sheets)
+
+  sheet_dfs <- lapply(sheet_names, function(x) xlsx::read.xlsx(template_path, sheetName = x))
+  names(sheet_dfs) <- sheet_names
+  sheet_dfs
+}

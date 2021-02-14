@@ -53,12 +53,12 @@ save_lists <- function(design,
 
   for (i in 1:n_lists) {
     current_list <- lists[[i]]
-    trial_type <- ifelse(separate_trials, current_list[['type']][[1L]], '')
+    trial_type <- ifelse(separate_trials, paste0(current_list[['type']][[1L]], "_"), '')
 
     # note: maybe there should be a check to see if the / is included. getwd
     # doesn't include it but a user might provide it manually.
     write.csv(current_list,
-              paste0(path, "/",trial_type, "_", filename,"_",file_labels[i], ".csv"),
+              paste0(path, "/",trial_type, filename,"_",file_labels[i], ".csv"),
               na = "",
               row.names = F)
   }
