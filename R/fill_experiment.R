@@ -11,7 +11,7 @@
 #' @export
 #'
 #' @examples
-fill_experiment <- function(design){
+fill_experiment <- function(design, use_as_is = F){
   stim_table <- get_stim_table(design)
   expanded <-
     merge(
@@ -24,11 +24,18 @@ fill_experiment <- function(design){
       allow.cartesian = T
     )
   expanded$tojoin <- NULL
-
+  is_counterbalanced <- any(!is.na(design[['counterbalance']]))
   # If counterbalance is specified, add to the expanded table
-  if (any(!is.na(design[['counterbalance']])))
+  if (is_counterbalanced)
     expanded$counterbalance <- design[['counterbalance']]
 
+  if (use_as_is){
+    expanded$trial <- 1:nrow(expanded)
+    attr(design$trials, 'printmsg') <-
+      paste0(nrow(expanded), " trials, participants will be given the entire set of stimuli.\n")
+    if(is_counterbalanced)
+      warning("You've specified counterbalancing by participant, yet you've set `use_as_is` as TRUE, suggesting a within-subjects design.")
+  }
   design[['complete_experiment']] <- expanded
   design
 }

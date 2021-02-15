@@ -84,7 +84,7 @@ add_stimuli_by <- function(design, ...){
   if (stimulus == 'constant_for_all') {
     new_printmsg <- paste0("  1 of ",
                            to_add,
-                           ", which is held constant across all trials.\n",
+                           ", which is only varies by trial.\n",
                            collapse = '')
   }
   else  {
@@ -220,14 +220,13 @@ add_stimuli_by <- function(design, ...){
 
 .make_crossed_presentation <- function(design, manipulations, columns){
   crossed <- .cross_manipulations(design, manipulations)
-  order_nums <-
-    names(crossed) %>%
-    str_extract('\\d$') %>%
-    as.integer() %>%
-    max(na.rm = TRUE)
-  if (is.infinite(order_nums))
+  order_nums <- as.integer(str_extract(names(crossed), '\\d$'))
+  none_specified <- all(is.na(order_nums))
+
+  if (none_specified)
     return(crossed)
-  order_nums <- 1:order_nums
+
+  order_nums <- 1:max(order_nums, na.rm = T)
 
   add_cols <-
     as.vector(

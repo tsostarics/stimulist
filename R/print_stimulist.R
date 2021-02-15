@@ -12,4 +12,5 @@ print.stimulist <- function(obj){
   cat(attr(obj$trials, 'printmsg'))
   cat(attr(obj$stimuli, 'printmsg'))
   cat(attr(obj$counterbalance, "printmsg"))
+  cat(attr(obj, 'glue_printmsg'))
 }

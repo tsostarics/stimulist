@@ -49,7 +49,7 @@ counterbalance <- function(design, method = "latinsquare"){
     else {
       n <-  length(design[['manipulations']][[i]])
       stimulus <- names(design[['manipulations']][i])
-      new_printmsg <- paste0(new_printmsg,"  ", n, " levels of ", stimulus)
+      new_printmsg <- paste0(new_printmsg,"  ", n, " levels of ", stimulus, "\n")
     }
   }
   attr(design[['counterbalance']], 'printmsg') <- new_printmsg
