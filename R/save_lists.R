@@ -21,8 +21,10 @@ save_lists <- function(design,
   if (!'complete_experiment' %in% names(design))
     stop("Please use fill_experiment() before trying to save lists")
   if (!'counterbalance' %in% names(design[['complete_experiment']])) {
-    warning("No counterbalancing has been set, please use counterbalance()")
-    write.csv(design[['complete_experiment']], paste0(path, "/", filename, ".csv"))
+    warning("No counterbalancing has been set, this will save only one list.")
+    write.csv(design[['complete_experiment']],
+              paste0(path, "/", filename, ".csv"),
+              row.names = F)
     return(NULL)
   }
 

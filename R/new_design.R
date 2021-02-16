@@ -13,6 +13,7 @@ new_design <- function(name = "Experiment"){
       orderings = list(),
       presentations = list(),
       counterbalance = NA,
+      completed_experiment = NA,
       name = name
     )
   attr(design$manipulations, 'printmsg') <- 'No manipulations set yet.\n'
@@ -24,7 +25,7 @@ new_design <- function(name = "Experiment"){
   attr(design$name, 'printmsg') <- paste0('Experiment Name: ', name, "\n")
   attr(design$trials, 'total') <- 0
   attr(design$stimuli, 'placeholder') <- TRUE
-  attr(design, 'glue_printmsg') <- ""
+  attr(design$counterbalance, 'printmsg') <- ''
   class(design) <- 'stimulist'
   design
 }

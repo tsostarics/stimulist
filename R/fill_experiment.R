@@ -29,7 +29,7 @@ fill_experiment <- function(design, use_as_is = F){
   if (is_counterbalanced)
     expanded$counterbalance <- design[['counterbalance']]
 
-  if (use_as_is){
+  if (use_as_is) {
     expanded$trial <- 1:nrow(expanded)
     attr(design$trials, 'printmsg') <-
       paste0(nrow(expanded), " trials, participants will be given the entire set of stimuli.\n")
@@ -37,5 +37,10 @@ fill_experiment <- function(design, use_as_is = F){
       warning("You've specified counterbalancing by participant, yet you've set `use_as_is` as TRUE, suggesting a within-subjects design.")
   }
   design[['complete_experiment']] <- expanded
+  .set_fill_printmsg(design)
+}
+
+.set_fill_printmsg <- function(design){
+  attr(design[['complete_experiment']], 'printmsg') <- "Completed table is ready.\n"
   design
 }

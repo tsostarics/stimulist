@@ -26,14 +26,13 @@ glue_filenames_by <- function(design, ...){
     stop("You must provide formulas of the style `varname ~ string`")
   else if (any(vapply(formulas, function(x) any(grepl(" [*+] ", x)), T)))
     stop("RHS of formula should only have a single string, not multiple with + or *.")
-  else if (is.null(design[['complete_experiment']])) # i might change this to be is_na where complete_experiment is specified in the constructor
+  else if (rlang::is_na(design[['complete_experiment']])) # i might change this to be is_na where complete_experiment is specified in the constructor
     stop("You need to run fill_experiment() before glue_filenames_by()")
 
 
   for (f in formulas) {
     fill_vars <- .get_containing_vars(design[['complete_experiment']], f[[2]])
     for (var in fill_vars) {
-      print(f[[3]])
       design[['complete_experiment']][[var]] <- glue::glue(f[[3]], .envir = design[['complete_experiment']])
     }
   }
@@ -41,13 +40,14 @@ glue_filenames_by <- function(design, ...){
 }
 
 .set_glue_printmsg <- function(design, formulas){
-  new_printmsg <- "Filenames specified:\n"
+  new_printmsg <- paste0(attr(design[['complete_experiment']], 'printmsg'),
+                         "Filenames specified:\n")
   formula_specifications <-
     vapply(formulas,
            function(x) paste0("  ",x[[2]], " values glued with: ", x[[3]], "\n"), "char")
   new_printmsg <-
     paste0(new_printmsg, paste0(formula_specifications, collapse = ""))
-  attr(design, 'glue_printmsg') <- new_printmsg
+  attr(design[['complete_experiment']], 'printmsg') <- new_printmsg
   design
 }
 

@@ -223,17 +223,17 @@ add_stimuli_by <- function(design, ...){
   order_nums <- as.integer(str_extract(names(crossed), '\\d$'))
   none_specified <- all(is.na(order_nums))
 
-  if (none_specified)
-    return(crossed)
-
+  if (!none_specified) {
   order_nums <- 1:max(order_nums, na.rm = T)
-
-  add_cols <-
+  numbered_cols <-
     as.vector(
       sapply(columns,
              FUN = function(x) paste(x, order_nums, sep = "_")
       )
     )
-  add_cols <- set_names(as.list(rep(NA, length(add_cols))), add_cols)
+  add_cols <- set_names(as.list(rep(NA, length(numbered_cols))), numbered_cols)
+  }
+  else
+    add_cols <- set_names(as.list(rep(NA, length(columns))), columns)
   cbind(crossed, add_cols)
 }
