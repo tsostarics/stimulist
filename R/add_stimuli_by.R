@@ -84,7 +84,7 @@ add_stimuli_by <- function(design, ...){
   if (stimulus == 'constant_for_all') {
     new_printmsg <- paste0("  1 of ",
                            to_add,
-                           ", which is only varies by trial.\n",
+                           ", which only varies by trial.\n",
                            collapse = '')
   }
   else  {

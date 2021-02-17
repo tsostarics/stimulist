@@ -29,19 +29,6 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE){
   else if (rlang::is_na(design[['complete_experiment']])) # i might change this to be is_na where complete_experiment is specified in the constructor
     stop("You need to run fill_experiment() before glue_filenames_by()")
 
-  # basically i think you need more logic to do the following:
-  # - parse the glue string for variables in brackets
-
-  # - check if any of those variables have orderings
-  # - if they have orderings, then create new versions of the glue string that
-  #   tacks on the _1 and _2 etc as they correspond to those from fill_vars
-  # - caveat: only do this for the ones that matter! eg contour_1 and contour_2
-  #   but not context.
-
-  # note: you can implement levels by changing the glue string to look like
-  # "sound/{as.integer(factor(context))} instead of just "sound/{context}.
-  # but consider adding a print msg that this is occuring.
-
   for (f in formulas) {
     glue_vars <- .extract_gluevars(f[[3]])
     glue_dependencies <- .check_orderings(design, glue_vars)
@@ -57,8 +44,9 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE){
 
 .expand_glue <- function(glue_string, varname, to_fill, as_levels){
   bracket <- ifelse(as_levels, r"())})", "}")
-  appendages <- paste0(str_extract(to_fill, "_\\d+$"), bracket)
-
+  extracted <- str_extract(to_fill, "_\\d+$")
+  appendages <- paste0(ifelse(is.na(extracted), '',extracted), bracket)
+  appendages <- ifelse(is.na(appendages),'',appendages)
   regex_pattern <- paste0("(?<=", paste0(varname, collapse = "|"),r"()})")
   ordered_gluestrings <-
     vapply(appendages,
