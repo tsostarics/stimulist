@@ -13,7 +13,7 @@ new_design <- function(name = "Experiment"){
       orderings = list(),
       presentations = list(),
       counterbalance = NA,
-      completed_experiment = NA,
+      complete_experiment = NA,
       name = name
     )
   attr(design$manipulations, 'printmsg') <- 'No manipulations set yet.\n'

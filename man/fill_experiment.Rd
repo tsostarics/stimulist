@@ -4,7 +4,7 @@
 \alias{fill_experiment}
 \title{Fill out experiment}
 \usage{
-fill_experiment(design)
+fill_experiment(design, use_as_is = F)
 }
 \arguments{
 \item{design}{}
