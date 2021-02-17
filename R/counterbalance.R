@@ -3,8 +3,8 @@
 #' This will counterbalance the entire experiment using a latin square approach
 #' by default. Right now it's actually the only method, but in the future this
 #' can be expanded further. Future functionality will also allow for different
-#' types of stimuli to be counterbalanced separately (eg, critical trials vs
-#' filler trials).
+#' types of stimuli to be counterbalanced separately (eg, critical items vs
+#' filler items).
 #'
 #' @param design
 #' @param method
@@ -61,15 +61,15 @@ counterbalance <- function(design, method = "latinsquare"){
 
 # Creates latin square list assignments
 .assign_latinsquare <- function(design){
-  n_trials <- attr(design[['trials']], 'total')
+  n_items <- attr(design[['items']], 'total')
   n_lists <- .calculate_lists(design)
 
-  assignments <- purrr::list_along(1:n_trials)
+  assignments <- purrr::list_along(1:n_items)
   ls_order <- 1:n_lists
   mod_n <- n_lists + 1
 
   # Procedure to create latinsquare groups
-  for (i in 1:n_trials) {
+  for (i in 1:n_items) {
     assignments[[i]] <- ls_order
     ls_order <- (ls_order + 1) %% mod_n
     zero_index <- which(ls_order == 0)

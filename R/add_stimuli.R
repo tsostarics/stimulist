@@ -15,7 +15,7 @@
 #' @examples
 #'
 #' # All acceptable ways to add audio and image variables (names arbitrary)
-#' test_design <- new_design() %>% add_trials(critical = 2, filler=1)
+#' test_design <- new_design() %>% add_items(critical = 2, filler=1)
 #' stims <- c('audio','image')
 #' test_design %>% add_stimuli(audio, image)
 #' test_design %>% add_stimuli('audio', 'image')

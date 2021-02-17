@@ -12,14 +12,14 @@
 #'
 #' new_design() %>%
 #' add_manipulations(context = c("IN", "OUT"), contour = c("HLL", "LLL")) %>%
-#' add_trials(critical = 12, filler = 8) %>%
+#' add_items(critical = 12, filler = 8) %>%
 #' add_stimuli_by(context ~ preamble_text + question_text, contour ~ audio_file)
 #'
 add_stimuli_by <- function(design, ...){
   # a ~ b + c becomes c('~', 'a', 'b + c') w/ as.character
   # note that in a onesided formula it would be c('~','b + c')
   formulas <- lapply(enexprs(...), as.character)
-  # n_trials <- attr(design[['trials']], 'total')
+  # n_items <- attr(design[['items']], 'total')
 
   for (stimset in formulas) {
 
@@ -35,7 +35,7 @@ add_stimuli_by <- function(design, ...){
     }
     else{
       # For stimuli that vary by a manipulation (manip ~ x + y + z...)
-      # Get the manipulation name, cross by number of trials, set name
+      # Get the manipulation name, cross by number of items, set name
       f_manip <- stimset[[2L]] # Manipulation from lhs of formula
       is_crossed <- grepl(' \\* ', f_manip)
       f_cols <- strsplit(as.character(stimset[[3L]]), " \\+ ")[[1L]]

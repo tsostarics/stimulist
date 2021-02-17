@@ -9,7 +9,7 @@
 #' @examples
 add_stims_2 <- function(design, ...){
   stims <- ensyms(...)
-  trial_types <- lmap(design[['trials']],
+  trial_types <- lmap(design[['items']],
                       function(x) setNames(list(1:x[[1L]]), names(x)))
   stimsets <- lmap(stims,
                    function(x) setNames(list(trial_types), as.character(x)))

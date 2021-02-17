@@ -11,9 +11,9 @@ create_template <- function(design){
   conditions$id <- 1 # for joining
 
   # Create trial information for each condition
-  trials <- get_stim_table(design)
+  items <- get_stim_table(design)
 
-  template <- left_join(conditions, trials, by = 'id')
+  template <- left_join(conditions, items, by = 'id')
   template$id <- NULL
   template <- set_filepaths(design, template)
   template

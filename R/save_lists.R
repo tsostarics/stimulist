@@ -6,7 +6,7 @@
 #'
 #' @param design
 #' @param filename
-#' @param separate_trials
+#' @param separate_items
 #'
 #' @return
 #' @export
@@ -15,7 +15,7 @@
 save_lists <- function(design,
                        filename="experiment",
                        path = getwd(),
-                       separate_trials = FALSE,
+                       separate_items = FALSE,
                        as_one_file = FALSE){
   # Error handling
   if (!'complete_experiment' %in% names(design))
@@ -37,7 +37,7 @@ save_lists <- function(design,
   }
 
   groups <- "counterbalance"
-  if (separate_trials) groups <- c(groups, 'type')
+  if (separate_items) groups <- c(groups, 'type')
 
   lists <-
     dplyr::group_split(
@@ -50,12 +50,12 @@ save_lists <- function(design,
   n_types <- length(unique(design[['complete_experiment']][['type']]))
   n_lists <- length(lists)
   file_labels <- 1:n_lists
-  if (separate_trials)
+  if (separate_items)
     file_labels <- ceiling(file_labels / n_types) # Allows for better numbering
 
   for (i in 1:n_lists) {
     current_list <- lists[[i]]
-    trial_type <- ifelse(separate_trials, paste0(current_list[['type']][[1L]], "_"), '')
+    trial_type <- ifelse(separate_items, paste0(current_list[['type']][[1L]], "_"), '')
 
     # note: maybe there should be a check to see if the / is included. getwd
     # doesn't include it but a user might provide it manually.

@@ -22,7 +22,7 @@ Add Stimuli by Manipulations
 
 new_design() \%>\%
 add_manipulations(context = c("IN", "OUT"), contour = c("HLL", "LLL")) \%>\%
-add_trials(critical = 12, filler = 8) \%>\%
+add_items(critical = 12, filler = 8) \%>\%
 add_stimuli_by(context ~ preamble_text + question_text, contour ~ audio_file)
 
 }

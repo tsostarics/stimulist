@@ -11,7 +11,7 @@ get_stim_table <- function(design, add_id=T){
   out <-
     rbindlist(
       lmap(
-        design[['trials']],
+        design[['items']],
         function(x)
           list(data.frame(stimulus = 1:x[[1L]], type = names(x)))
       )

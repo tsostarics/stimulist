@@ -4,7 +4,7 @@
 \alias{glue_filenames_by}
 \title{Glue filenames by glue string}
 \usage{
-glue_filenames_by(design, ...)
+glue_filenames_by(design, ..., as_levels = FALSE)
 }
 \arguments{
 \item{...}{}

@@ -31,16 +31,25 @@ fill_experiment <- function(design, use_as_is = F){
 
   if (use_as_is) {
     expanded$trial <- 1:nrow(expanded)
-    attr(design$trials, 'printmsg') <-
-      paste0(nrow(expanded), " trials, participants will be given the entire set of stimuli.\n")
+    attr(design$items, 'printmsg') <-
+      paste0(nrow(expanded), " items, participants will be given the entire set of stimuli.\n")
     if(is_counterbalanced)
       warning("You've specified counterbalancing by participant, yet you've set `use_as_is` as TRUE, suggesting a within-subjects design.")
   }
   design[['complete_experiment']] <- expanded
-  .set_fill_printmsg(design)
+  .set_fill_printmsg(design, is_counterbalanced)
 }
 
-.set_fill_printmsg <- function(design){
-  attr(design[['complete_experiment']], 'printmsg') <- "Completed table is ready.\n"
+.set_fill_printmsg <- function(design, is_counterbalanced){
+  n_trials <- nrow(design[['complete_experiment']])
+  new_printmsg <- paste0("Completed table of ", n_trials," trials ")
+  if (is_counterbalanced)
+    new_printmsg <- paste0(new_printmsg,
+                           "(",
+                           n_trials/max(design[['complete_experiment']][['counterbalance']]),
+                           " per list) is ready.\n")
+  else
+    new_printmsg <- paste0(new_printmsg, "is ready.\n")
+  attr(design[['complete_experiment']], 'printmsg') <- new_printmsg
   design
 }

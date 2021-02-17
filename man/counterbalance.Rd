@@ -16,6 +16,6 @@ counterbalance(design, method = "latinsquare")
 This will counterbalance the entire experiment using a latin square approach
 by default. Right now it's actually the only method, but in the future this
 can be expanded further. Future functionality will also allow for different
-types of stimuli to be counterbalanced separately (eg, critical trials vs
-filler trials).
+types of stimuli to be counterbalanced separately (eg, critical items vs
+filler items).
 }

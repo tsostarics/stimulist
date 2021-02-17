@@ -8,12 +8,12 @@ save_lists(
   design,
   filename = "experiment",
   path = getwd(),
-  separate_trials = FALSE,
+  separate_items = FALSE,
   as_one_file = FALSE
 )
 }
 \arguments{
-\item{separate_trials}{}
+\item{separate_items}{}
 }
 \value{
 
