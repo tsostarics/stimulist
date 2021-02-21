@@ -158,8 +158,8 @@ add_stimuli_by <- function(design, ...) {
   # For each of the columns to add, append 1:order_nums
   add_cols <-
     as.vector(
-      vapply(columns,
-        FUN = function(x) paste(x, order_nums, sep = "_"), FUN.VALUE = "char"
+      sapply(columns,
+        FUN = function(x) paste(x, order_nums, sep = "_")
       )
     )
 
