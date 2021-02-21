@@ -9,7 +9,7 @@
 #' @export
 #' @importFrom stats setNames
 add_stimuli_by <- function(design, ...) {
-  formulas <- lapply(enexprs(...), as.character)
+  formulas <- .clean_formulas(lapply(enexprs(...), as.character))
 
   for (stimset in formulas) {
 
@@ -77,9 +77,9 @@ add_stimuli_by <- function(design, ...) {
 .set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE) {
   if (stimulus == "constant_for_all") {
     new_printmsg <- paste0("  1 of ",
-      to_add,
-      ", which only varies by trial.\n",
-      collapse = ""
+                           to_add,
+                           ", which only varies by trial.\n",
+                           collapse = ""
     )
   }
   else {
@@ -107,13 +107,13 @@ add_stimuli_by <- function(design, ...) {
         )
       )
     new_printmsg <- paste0("  ",
-      n,
-      " of ",
-      to_add,
-      ", which varies by ",
-      stimstring,
-      ".\n",
-      collapse = ""
+                           n,
+                           " of ",
+                           to_add,
+                           ", which varies by ",
+                           stimstring,
+                           ".\n",
+                           collapse = ""
     )
   }
   attr(design[["stimuli"]][[stimulus]], "printmsg") <- new_printmsg
@@ -146,9 +146,45 @@ add_stimuli_by <- function(design, ...) {
 }
 
 .clean_formulas <- function(formulas) {
-  # note: need to add a helper function that merges formulas when they
-  # address the same manipulation. eg in add_stimuli_by(~one, ~two), two
-  # will overwrite one unlike in add_stimuli_by(~one + two)
+  formula_lengths <- vapply(formulas, length, 1L)
+  if (any(formula_lengths > 3 | formula_lengths < 2))
+    stop("Malformed formula")
+
+  # Handle one sided formulas
+  no_lhs <- vapply(tst, function(x) length(x) == 2, T)
+  combined_onesided <-
+    c("~",
+      paste0(
+        vapply(
+          formulas[no_lhs],
+          function(x) x[[2]], 'char'
+        ),
+        collapse = ' + '
+      )
+    )
+
+  # Handle two sided formulas
+  # Get all the variables given in the lhs of the formulas
+  lhs <-  unique(vapply(formulas[!no_lhs], function(x) x[[2]], 'char'))
+  combined_twosided <-
+    # For each lhs variable, combine into one formula
+    purrr::lmap(lhs,
+                function(x){
+                  rhs <- vapply(formulas,
+                                function(y)
+                                  ifelse(y[[2]] == x, # LHS given in 2nd element
+                                         y[[3]], # RHS given in 3rd element
+                                         character(0)
+                                  ),
+                                "char"
+                  )
+                  rhs <- rhs[!is.na(rhs)]
+                  list(c("~", x, paste0(rhs, collapse = " + ")))
+                }
+    )
+
+  c(list(combined_onesided), combined_twosided)
+
 }
 
 .make_presentation <- function(design, manipulation, columns) {
@@ -159,7 +195,7 @@ add_stimuli_by <- function(design, ...) {
   add_cols <-
     as.vector(
       sapply(columns,
-        FUN = function(x) paste(x, order_nums, sep = "_")
+             FUN = function(x) paste(x, order_nums, sep = "_")
       )
     )
 
@@ -237,7 +273,7 @@ add_stimuli_by <- function(design, ...) {
     numbered_cols <-
       as.vector(
         sapply(columns,
-          FUN = function(x) paste(x, order_nums, sep = "_")
+               FUN = function(x) paste(x, order_nums, sep = "_")
         )
       )
     add_cols <- setNames(as.list(rep(NA, length(numbered_cols))), numbered_cols)
