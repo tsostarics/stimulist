@@ -7,7 +7,11 @@
 glue_filenames_by(design, ..., as_levels = FALSE)
 }
 \arguments{
-\item{...}{}
+\item{design}{Experiment design}
+
+\item{...}{A list of formulas mapping stimuli to glue-formatted strings}
+
+\item{as_levels}{Whether to use the labels or integers representing each level}
 }
 \value{
 

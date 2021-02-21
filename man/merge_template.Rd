@@ -7,7 +7,9 @@
 merge_template(design, template_path)
 }
 \arguments{
-\item{template_path}{}
+\item{design}{Experiment design}
+
+\item{template_path}{Path to template file}
 }
 \value{
 

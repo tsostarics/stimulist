@@ -7,7 +7,9 @@
 relocate_columns(design, ...)
 }
 \arguments{
-\item{...}{}
+\item{design}{Experiment design}
+
+\item{...}{Series of unquoted columns to move to the far left}
 }
 \value{
 

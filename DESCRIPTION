@@ -12,6 +12,17 @@ LazyData: true
 RoxygenNote: 7.1.1
 Imports: 
     gtools,
-    magrittr
+    magrittr,
+    rlang,
+    data.table,
+    stringr,
+    dplyr,
+    tidyselect,
+    purrr
 URL: https://github.com/tsostarics/stimulist
 BugReports: https://github.com/tsostarics/stimulist/issues
+Suggests: 
+    xlsx,
+    glue,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3

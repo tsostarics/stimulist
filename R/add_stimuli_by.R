@@ -7,63 +7,57 @@
 #'
 #' @return
 #' @export
-#'
-#' @examples
-#'
-#' new_design() %>%
-#' add_manipulations(context = c("IN", "OUT"), contour = c("HLL", "LLL")) %>%
-#' add_items(critical = 12, filler = 8) %>%
-#' add_stimuli_by(context ~ preamble_text + question_text, contour ~ audio_file)
-#'
-add_stimuli_by <- function(design, ...){
-  # a ~ b + c becomes c('~', 'a', 'b + c') w/ as.character
-  # note that in a onesided formula it would be c('~','b + c')
+#' @importFrom stats setNames
+add_stimuli_by <- function(design, ...) {
   formulas <- lapply(enexprs(...), as.character)
-  # n_items <- attr(design[['items']], 'total')
 
   for (stimset in formulas) {
 
-    # If this stimulus doesn't vary by any manipulation ( ~ x) then just bind
-    # the columns to the columns in the stimulus table and add to the design
+    # If this stimulus doesn't vary by any manipulation ( ~ x)
     if (length(stimset) == 2) {
       f_cols <- strsplit(stimset[[2L]], " \\+ ")[[1L]]
-      add_cols <- lmap(f_cols, function(x) setNames(list(NA), x))
+      add_cols <- purrr::lmap(f_cols, function(x) setNames(list(NA), x))
       output <- cbind(data.frame(tojoin = 1), add_cols)
-      design[['stimuli']][['constant_for_all']] <- output
-      design[['presentations']][['constant_for_all']] <- output
-      design <- .set_stimulus_printmsg(design, 'constant_for_all', f_cols)
+      design[["stimuli"]][["constant_for_all"]] <- output
+      design[["presentations"]][["constant_for_all"]] <- output
+      design <- .set_stimulus_printmsg(design, "constant_for_all", f_cols)
     }
-    else{
+    else {
       # For stimuli that vary by a manipulation (manip ~ x + y + z...)
       # Get the manipulation name, cross by number of items, set name
       f_manip <- stimset[[2L]] # Manipulation from lhs of formula
-      is_crossed <- grepl(' \\* ', f_manip)
+      is_crossed <- grepl(" \\* ", f_manip)
       f_cols <- strsplit(as.character(stimset[[3L]]), " \\+ ")[[1L]]
 
       # Create grid for the manipulation
       grid <- .create_grid(design, f_manip)
 
-      f_manip <- gsub(' \\* ', ' x ', f_manip) # change * to x for filenames
+      f_manip <- gsub(" \\* ", " x ", f_manip) # change * to x for filenames
 
       # Make empty singleton columns to bind to output
-      add_cols <- set_names(as.list(rep(NA, length(f_cols))), f_cols)
+      add_cols <- setNames(as.list(rep(NA, length(f_cols))), f_cols)
 
       output <- cbind(grid, add_cols)
 
-      design[['stimuli']][[f_manip]] <- output
+      design[["stimuli"]][[f_manip]] <- output
 
-      if (is_crossed)
-        design[['presentations']][[f_manip]] <-
-        .make_crossed_presentation(design,
-                                   f_manip,
-                                   f_cols)
-      else {
-        if (attr(design[['manipulations']][[f_manip]], 'has_order'))
-          design[['presentations']][[f_manip]] <- .make_presentation(design,
-                                                                     f_manip,
-                                                                     f_cols)
-        else
-          design[['presentations']][[f_manip]] <- output
+      if (is_crossed) {
+        design[["presentations"]][[f_manip]] <-
+          .make_crossed_presentation(
+            design,
+            f_manip,
+            f_cols
+          )
+      } else {
+        if (attr(design[["manipulations"]][[f_manip]], "has_order")) {
+          design[["presentations"]][[f_manip]] <- .make_presentation(
+            design,
+            f_manip,
+            f_cols
+          )
+        } else {
+          design[["presentations"]][[f_manip]] <- output
+        }
       }
       design <- .set_stimulus_printmsg(design, f_manip, f_cols, is_crossed)
     }
@@ -71,58 +65,63 @@ add_stimuli_by <- function(design, ...){
   .set_stimuli_printmsg(design)
 }
 
-.set_stimuli_printmsg <- function(design){
+.set_stimuli_printmsg <- function(design) {
   new_printmsg <- "Each trial presents these stimuli:\n"
-  for (i in 1:length(design$stimuli)) {
-    new_printmsg <- paste0(new_printmsg, attr(design$stimuli[[i]], 'printmsg'))
+  for (i in 1:length(design[['stimuli']])) {
+    new_printmsg <- paste0(new_printmsg, attr(design[['stimuli']][[i]], "printmsg"))
   }
-  attr(design$stimuli, 'printmsg') <- new_printmsg
+  attr(design$stimuli, "printmsg") <- new_printmsg
   design
 }
 
-.set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE){
-  if (stimulus == 'constant_for_all') {
+.set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE) {
+  if (stimulus == "constant_for_all") {
     new_printmsg <- paste0("  1 of ",
-                           to_add,
-                           ", which only varies by trial.\n",
-                           collapse = '')
+      to_add,
+      ", which only varies by trial.\n",
+      collapse = ""
+    )
   }
-  else  {
-    if (is_crossed)
+  else {
+    if (is_crossed) {
       stimstring <- gsub(" x ", " and ", stimulus)
-    else
+    } else {
       stimstring <- stimulus
+    }
 
     lookup <- strsplit(stimulus, " x ")[[1]]
     is_ordered <-
-      vapply(lookup,
-             function(x)
-               attr(design[['manipulations']][[x]], 'has_order'),
-             TRUE
+      vapply(
+        lookup,
+        function(x) {
+          attr(design[["manipulations"]][[x]], "has_order")
+        },
+        TRUE
       )
     n <-
       prod(
         vapply(
           lookup[is_ordered],
-          function(x) length(design[['orderings']][[x]]),
+          function(x) length(design[["orderings"]][[x]]),
           1L
         )
       )
     new_printmsg <- paste0("  ",
-                           n,
-                           " of ",
-                           to_add,
-                           ", which varies by ",
-                           stimstring,
-                           ".\n",
-                           collapse = '')
+      n,
+      " of ",
+      to_add,
+      ", which varies by ",
+      stimstring,
+      ".\n",
+      collapse = ""
+    )
   }
-  attr(design[['stimuli']][[stimulus]], 'printmsg') <- new_printmsg
+  attr(design[["stimuli"]][[stimulus]], "printmsg") <- new_printmsg
   design
 }
 
-.create_grid <- function(design, rhs){
-  is_crossed <- grepl(' \\* ', rhs)
+.create_grid <- function(design, rhs) {
+  is_crossed <- grepl(" \\* ", rhs)
 
   if (is_crossed) {
     # Extract the crossed manipulations
@@ -131,109 +130,120 @@ add_stimuli_by <- function(design, ...){
     # Compose an expand.grid call with all the crossed manipulations
     eg_call <- list(quote(expand.grid))
     for (i in 1:length(manips)) {
-      eg_call[[i + 1L]] <- design[['manipulations']][[manips[i]]]
+      eg_call[[i + 1L]] <- design[["manipulations"]][[manips[i]]]
     }
     grid <- eval(as.call(eg_call))
     names(grid) <- manips
-
-  } else{
+  } else {
     grid <-
       setNames(
-        as.data.frame(design[['manipulations']][[rhs]]),
+        as.data.frame(design[["manipulations"]][[rhs]]),
         rhs
       )
-
   }
   grid$tojoin <- 1L
   grid
 }
 
-.clean_formulas <- function(formulas){
+.clean_formulas <- function(formulas) {
   # note: need to add a helper function that merges formulas when they
   # address the same manipulation. eg in add_stimuli_by(~one, ~two), two
   # will overwrite one unlike in add_stimuli_by(~one + two)
 }
 
-.make_presentation <- function(design, manipulation, columns){
+.make_presentation <- function(design, manipulation, columns) {
   # Extract ordering for this manipulation, and get the number to present
-  ordering <- design[['orderings']][[manipulation]]
+  ordering <- design[["orderings"]][[manipulation]]
   order_nums <- 1:length(ordering)
   # For each of the columns to add, append 1:order_nums
   add_cols <-
     as.vector(
-      sapply(columns,
-             FUN = function(x) paste(x, order_nums, sep = "_")
+      vapply(columns,
+        FUN = function(x) paste(x, order_nums, sep = "_"), FUN.VALUE = "char"
       )
     )
 
   # Turn the vector of columns to add into a named list for cbind
-  add_cols <- set_names(as.list(rep(NA, length(add_cols))), add_cols)
+  add_cols <- setNames(as.list(rep(NA, length(add_cols))), add_cols)
 
   output <- cbind(ordering, add_cols)
   output$tojoin <- 1
   output
 }
 
-.cross_manipulations <- function(design, manipulations){
+.cross_manipulations <- function(design, manipulations) {
   manipulations <- strsplit(manipulations, " x ")[[1]]
-  is_ordered <- manipulations %in% names(design[['orderings']])
-  orderings <- design[['orderings']][manipulations[is_ordered]]
-  unorderings <- design[['manipulations']][manipulations[!is_ordered]]
+  is_ordered <- manipulations %in% names(design[["orderings"]])
+  orderings <- design[["orderings"]][manipulations[is_ordered]]
+  unorderings <- design[["manipulations"]][manipulations[!is_ordered]]
 
   unordered_dfs <-
-    lmap(unorderings,
-         function(x){
-           outdf <- as.data.frame(x)
-           outdf$tojoin <- 1
-           list(outdf)
-         })
+    purrr::lmap(
+      unorderings,
+      function(x) {
+        outdf <- as.data.frame(x)
+        outdf$tojoin <- 1
+        list(outdf)
+      }
+    )
 
   ordered_dfs <-
-    lmap(orderings,
-         function(x){
-           x[[1]]$tojoin <- 1
-           x
-         })
+    purrr::lmap(
+      orderings,
+      function(x) {
+        x[[1]][['tojoin']] <- 1
+        x
+      }
+    )
 
 
   merged_ordered <-
-    Reduce(function(x,y)
-      merge(x,y, by = 'tojoin', all = T),
-      ordered_dfs)
+    Reduce(
+      function(x, y) {
+        merge(x, y, by = "tojoin", all = T)
+      },
+      ordered_dfs
+    )
 
   merged_unordered <-
-    Reduce(function(x,y)
-      merge(x,y, by = 'tojoin', all = T),
-      unordered_dfs)
+    Reduce(
+      function(x, y) {
+        merge(x, y, by = "tojoin", all = T)
+      },
+      unordered_dfs
+    )
 
-  if (is.null(merged_ordered) & is.null(merged_unordered))
+  if (is.null(merged_ordered) & is.null(merged_unordered)) {
     stop("No variables provided or invalid variables")
+  }
 
-  if (is.null(merged_ordered))
+  if (is.null(merged_ordered)) {
     merged_all <- merged_unordered
-  else if (is.null(merged_unordered))
+  } else if (is.null(merged_unordered)) {
     merged_all <- merged_ordered
-  else
-    merged_all <- merge(merged_unordered, merged_ordered, by = 'tojoin', all = T)
+  } else {
+    merged_all <- merge(merged_unordered, merged_ordered, by = "tojoin", all = T)
+  }
   merged_all
 }
 
-.make_crossed_presentation <- function(design, manipulations, columns){
+.make_crossed_presentation <- function(design, manipulations, columns) {
   crossed <- .cross_manipulations(design, manipulations)
-  order_nums <- as.integer(str_extract(names(crossed), '\\d$'))
+  order_nums <- as.integer(str_extract(names(crossed), "\\d$"))
   none_specified <- all(is.na(order_nums))
 
   if (!none_specified) {
-  order_nums <- 1:max(order_nums, na.rm = T)
-  numbered_cols <-
-    as.vector(
-      sapply(columns,
-             FUN = function(x) paste(x, order_nums, sep = "_")
+    order_nums <- 1:max(order_nums, na.rm = T)
+    numbered_cols <-
+      as.vector(
+        sapply(columns,
+          FUN = function(x) paste(x, order_nums, sep = "_")
+        )
       )
-    )
-  add_cols <- set_names(as.list(rep(NA, length(numbered_cols))), numbered_cols)
+    add_cols <- setNames(as.list(rep(NA, length(numbered_cols))), numbered_cols)
   }
-  else
-    add_cols <- set_names(as.list(rep(NA, length(columns))), columns)
+  else {
+    add_cols <- setNames(as.list(rep(NA, length(columns))), columns)
+  }
   cbind(crossed, add_cols)
 }

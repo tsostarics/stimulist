@@ -7,7 +7,9 @@
 save_stimuli_templates(design, as_workbook = TRUE)
 }
 \arguments{
-\item{design}{A design}
+\item{design}{Experiment design}
+
+\item{as_workbook}{Whether to save as an excel workbook or not}
 }
 \value{
 

@@ -1,22 +1,24 @@
 #' Create table for stimuli
 #'
-#' @param design
-#' @param add_id
+#' @param design Experiment design
+#' @param add_id Whether to add an id to join by
 #'
 #' @return
 #' @export
 #'
 #' @examples
-get_stim_table <- function(design, add_id=T){
+#' @importFrom data.table rbindlist
+get_stim_table <- function(design, add_id = T) {
   out <-
     rbindlist(
-      lmap(
-        design[['items']],
-        function(x)
+      purrr::lmap(
+        design[["items"]],
+        function(x) {
           list(data.frame(stimulus = 1:x[[1L]], type = names(x)))
+        }
       )
     )
-  out$trial <- 1:nrow(out)
-  if (add_id) out$tojoin <- 1
+  out[["trial"]] <- 1:nrow(out)
+  if (add_id) out[["tojoin"]] <- 1
   out
 }

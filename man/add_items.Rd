@@ -7,7 +7,9 @@
 add_items(design, ...)
 }
 \arguments{
-\item{...}{}
+\item{design}{Experiment design}
+
+\item{...}{a series of named arguments with manipulation levels}
 }
 \value{
 

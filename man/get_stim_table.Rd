@@ -7,7 +7,9 @@
 get_stim_table(design, add_id = T)
 }
 \arguments{
-\item{add_id}{}
+\item{design}{Experiment design}
+
+\item{add_id}{Whether to add an id to join by}
 }
 \value{
 

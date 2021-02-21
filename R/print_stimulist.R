@@ -1,16 +1,17 @@
 #' Title
 #'
-#' @param obj
+#' @param x object
+#' @param ... additional arguments
 #'
 #' @return
 #' @export
 #'
 #' @examples
-print.stimulist <- function(obj){
-  cat(attr(obj$name, 'printmsg'))
-  cat(attr(obj$manipulations, 'printmsg'))
-  cat(attr(obj$items, 'printmsg'))
-  cat(attr(obj$stimuli, 'printmsg'))
-  cat(attr(obj$counterbalance, "printmsg"))
-  cat(attr(obj$complete_experiment, 'printmsg'))
+print.stimulist <- function(x, ...) {
+  cat(attr(x[['name']], "printmsg"))
+  cat(attr(x[['manipulations']], "printmsg"))
+  cat(attr(x[['items']], "printmsg"))
+  cat(attr(x[['stimuli']], "printmsg"))
+  cat(attr(x[['counterbalance']], "printmsg"))
+  cat(attr(x[['complete_experiment']], "printmsg"))
 }

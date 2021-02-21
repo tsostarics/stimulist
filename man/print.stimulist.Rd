@@ -4,10 +4,12 @@
 \alias{print.stimulist}
 \title{Title}
 \usage{
-\method{print}{stimulist}(obj)
+\method{print}{stimulist}(x, ...)
 }
 \arguments{
-\item{obj}{}
+\item{x}{object}
+
+\item{...}{additional arguments}
 }
 \value{
 

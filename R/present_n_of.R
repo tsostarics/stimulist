@@ -8,31 +8,34 @@
 #' @export
 #' @importFrom gtools permutations
 #' @examples
-present_n_of <- function(design, manipulation, n){
+present_n_of <- function(design, manipulation, n) {
   # Enable unquoted argument for ease
   manipulation <- as.character(enexpr(manipulation))
 
-  if (!manipulation %in% names(design[['manipulations']]))
-    stop(paste0("manipulation ",manipulation," not found in current design"))
-  if (n > length(design[['manipulations']][[manipulation]]))
+  if (!manipulation %in% names(design[["manipulations"]])) {
+    stop(paste0("manipulation ", manipulation, " not found in current design"))
+  }
+  if (n > length(design[["manipulations"]][[manipulation]])) {
     stop("n is greater than the number of conditions for this manipulation")
+  }
 
   # Get the conditions for the manipulation
-  conditions <- design[['manipulations']][[manipulation]]
+  conditions <- design[["manipulations"]][[manipulation]]
 
   # Get a matrix with each permutation of "condition pick n"
   perm_matrix <- data.frame(permutations(length(conditions), r = n, conditions))
 
   # Set names of each column in the matrix to manipulation_1...n
   choice_names <- vapply(1:n,
-                         FUN = function(x) paste(manipulation, x, sep = "_"),
-                         FUN.VALUE = 'character')
+    FUN = function(x) paste(manipulation, x, sep = "_"),
+    FUN.VALUE = "character"
+  )
   names(perm_matrix) <- choice_names
 
   # Retain the original info of the manipulation, but set the new ordering
-  design[['orderings']][[manipulation]] <- perm_matrix
-  attr(design[['manipulations']][[manipulation]], 'has_order') <- TRUE
-  attr(design[['orderings']][[manipulation]], 'r') <- n
-  attr(design[['orderings']][[manipulation]], 'n') <- length(design[['manipulations']][[manipulation]])
+  design[["orderings"]][[manipulation]] <- perm_matrix
+  attr(design[["manipulations"]][[manipulation]], "has_order") <- TRUE
+  attr(design[["orderings"]][[manipulation]], "r") <- n
+  attr(design[["orderings"]][[manipulation]], "n") <- length(design[["manipulations"]][[manipulation]])
   design
 }

@@ -7,7 +7,10 @@
 fill_experiment(design, use_as_is = F)
 }
 \arguments{
-\item{design}{}
+\item{design}{Experiment design}
+
+\item{use_as_is}{Whether to use all the generated combinations as trials. Use
+when you plan to present all of the trials to every participant.}
 }
 \value{
 

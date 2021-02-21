@@ -7,7 +7,9 @@
 counterbalance(design, method = "latinsquare")
 }
 \arguments{
-\item{method}{}
+\item{design}{Experiment design}
+
+\item{method}{Method for counterbalancing, defaults to latinsquare}
 }
 \value{
 

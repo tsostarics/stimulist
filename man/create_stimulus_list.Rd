@@ -7,7 +7,7 @@
 create_stimulus_list(design)
 }
 \arguments{
-\item{design}{}
+\item{design}{Experiment design}
 }
 \value{
 

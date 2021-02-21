@@ -13,7 +13,16 @@ save_lists(
 )
 }
 \arguments{
-\item{separate_items}{}
+\item{design}{Experiment design}
+
+\item{filename}{Name to use for output files}
+
+\item{path}{Directory to save files into (default is getwd())}
+
+\item{separate_items}{Whether to save separate files for different types of
+items (eg critical and filler lists are saved separately)}
+
+\item{as_one_file}{Whether you want to save all trials as 1 file}
 }
 \value{
 

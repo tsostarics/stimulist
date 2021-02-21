@@ -7,7 +7,9 @@
 add_manipulations(design, ...)
 }
 \arguments{
-\item{...}{}
+\item{design}{Experiment design}
+
+\item{...}{A series of named arguments with manipulation levels}
 }
 \value{
 

@@ -13,99 +13,118 @@
 #'
 #' This must be run after using fill_experiment.
 #'
-#' @param design
-#' @param ...
+#' @param design Experiment design
+#' @param ... A list of formulas mapping stimuli to glue-formatted strings
+#' @param as_levels Whether to use the labels or integers representing each level
 #'
 #' @return
 #' @export
 #'
 #' @examples
-glue_filenames_by <- function(design, ..., as_levels = FALSE){
+#' @importFrom rlang enexprs enquos enexpr syms ensyms
+#' @importFrom stringr str_extract str_match_all
+glue_filenames_by <- function(design, ..., as_levels = FALSE) {
+  requireNamespace("glue", quietly = TRUE)
   formulas <- lapply(enexprs(...), as.character)
-  if (!all(vapply(formulas, length, 1L) == 3))
+  if (!all(vapply(formulas, length, 1L) == 3)) {
     stop("You must provide formulas of the style `varname ~ string`")
-  else if (any(vapply(formulas, function(x) any(grepl(" [*+] ", x)), T)))
+  } else if (any(vapply(formulas, function(x) any(grepl(" [*+] ", x)), T))) {
     stop("RHS of formula should only have a single string, not multiple with + or *.")
-  else if (rlang::is_na(design[['complete_experiment']])) # i might change this to be is_na where complete_experiment is specified in the constructor
+  } else if (rlang::is_na(design[["complete_experiment"]])) {
     stop("You need to run fill_experiment() before glue_filenames_by()")
+  }
 
   for (f in formulas) {
     glue_vars <- .extract_gluevars(f[[3]])
     glue_dependencies <- .check_orderings(design, glue_vars)
-    fill_vars <- .get_containing_vars(design[['complete_experiment']], f[[2]])
+    fill_vars <- .get_containing_vars(design[["complete_experiment"]], f[[2]])
     glue_strings <- .expand_glue(f[[3]], glue_dependencies, fill_vars, as_levels)
 
     for (i in 1:length(fill_vars)) {
-      design[['complete_experiment']][[fill_vars[i]]] <- glue::glue(glue_strings[i], .envir = design[['complete_experiment']])
+      design[["complete_experiment"]][[fill_vars[i]]] <- glue::glue(glue_strings[i], .envir = design[["complete_experiment"]])
     }
   }
   .set_glue_printmsg(design, formulas, as_levels)
 }
 
-.expand_glue <- function(glue_string, varname, to_fill, as_levels){
+.expand_glue <- function(glue_string, varname, to_fill, as_levels) {
   bracket <- ifelse(as_levels, r"())})", "}")
   extracted <- str_extract(to_fill, "_\\d+$")
-  appendages <- paste0(ifelse(is.na(extracted), '',extracted), bracket)
-  appendages <- ifelse(is.na(appendages),'',appendages)
-  regex_pattern <- paste0("(?<=", paste0(varname, collapse = "|"),r"()})")
+  appendages <- paste0(ifelse(is.na(extracted), "", extracted), bracket)
+  appendages <- ifelse(is.na(appendages), "", appendages)
+  regex_pattern <- paste0("(?<=", paste0(varname, collapse = "|"), r"()})")
   ordered_gluestrings <-
     vapply(appendages,
-           function(x)
-             gsub(regex_pattern, x, glue_string, perl = T),
-           FUN.VALUE = "char",
-           USE.NAMES = F)
+      function(x) {
+        gsub(regex_pattern, x, glue_string, perl = T)
+      },
+      FUN.VALUE = "char",
+      USE.NAMES = F
+    )
 
   if (as_levels) {
     glue_vars <- paste0(.extract_gluevars(glue_string), collapse = "|")
-    factor_regex <- paste0(r"({(?=)", glue_vars,")")
-    closing_regex <- paste0(r"((?<=)", glue_vars,")}")
+    factor_regex <- paste0(r"({(?=)", glue_vars, ")")
+    closing_regex <- paste0(r"((?<=)", glue_vars, ")}")
     ordered_gluestrings <-
       vapply(ordered_gluestrings,
-             function(x)
-               gsub(closing_regex,
-                    r"())})",
-                    gsub(factor_regex,
-                         r"({as.integer(factor()",
-                         x,
-                         perl = T
-                    ),
-                    perl = T
-               ),
-             FUN.VALUE = "char",
-             USE.NAMES = F)
+        function(x) {
+          gsub(closing_regex,
+            r"())})",
+            gsub(factor_regex,
+              r"({as.integer(factor()",
+              x,
+              perl = T
+            ),
+            perl = T
+          )
+        },
+        FUN.VALUE = "char",
+        USE.NAMES = F
+      )
   }
   ordered_gluestrings
 }
 
-.extract_gluevars <- function(gluestring){
-  str_match_all(gluestring, "\\{([^\\}]+)\\}")[[1L]][,2]
+.extract_gluevars <- function(gluestring) {
+  str_match_all(gluestring, "\\{([^\\}]+)\\}")[[1L]][, 2]
 }
 
-.check_orderings <- function(design, gluevars){
-  have_orderings <- vapply(gluevars, function(x) x %in% names(design[['orderings']]), TRUE)
+.check_orderings <- function(design, gluevars) {
+  have_orderings <- vapply(gluevars, function(x) x %in% names(design[["orderings"]]), TRUE)
   gluevars[have_orderings]
 }
 
-.set_glue_printmsg <- function(design, formulas, as_levels){
-  new_printmsg <- paste0(attr(design[['complete_experiment']], 'printmsg'),
-                         "Filenames specified")
+.set_glue_printmsg <- function(design, formulas, as_levels) {
+  new_printmsg <- paste0(
+    attr(design[["complete_experiment"]], "printmsg"),
+    "Filenames specified"
+  )
   new_printmsg <- ifelse(as_levels,
-                         paste0(new_printmsg,
-                                " (using numbering by alphabetical order of levels):\n"),
-                         paste0(new_printmsg,
-                                ":\n"))
+    paste0(
+      new_printmsg,
+      " (using numbering by alphabetical order of levels):\n"
+    ),
+    paste0(
+      new_printmsg,
+      ":\n"
+    )
+  )
   formula_specifications <-
-    vapply(formulas,
-           function(x) paste0("  ",x[[2]], " values glued with: ", x[[3]], "\n"), "char")
+    vapply(
+      formulas,
+      function(x) paste0("  ", x[[2]], " values glued with: ", x[[3]], "\n"), "char"
+    )
   new_printmsg <-
     paste0(new_printmsg, paste0(formula_specifications, collapse = ""))
-  attr(design[['complete_experiment']], 'printmsg') <- new_printmsg
+  attr(design[["complete_experiment"]], "printmsg") <- new_printmsg
   design
 }
 
-.get_containing_vars <- function(completed_df, var){
+.get_containing_vars <- function(completed_df, var) {
   output <- names(completed_df)[grepl(var, names(completed_df))]
-  if (identical(output, character(0)))
+  if (identical(output, character(0))) {
     stop(paste0("`", var, "` not found in the experimental design."))
+  }
   output
 }
