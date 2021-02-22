@@ -32,7 +32,7 @@ fill_experiment <- function(design, use_as_is = F) {
   }
 
   if (use_as_is) {
-    expanded$trial <- 1:nrow(expanded)
+    expanded$trial <- seq_len(nrow(expanded))
     attr(design$items, "printmsg") <-
       paste0(nrow(expanded), " items, participants will be given the entire set of stimuli.\n")
     if (is_counterbalanced) {

@@ -52,12 +52,12 @@ save_lists <- function(design,
 
   n_types <- length(unique(design[["complete_experiment"]][["type"]]))
   n_lists <- length(lists)
-  file_labels <- 1:n_lists
+  file_labels <- seq_len(n_lists)
   if (separate_items) {
     file_labels <- ceiling(file_labels / n_types)
   } # Allows for better numbering
 
-  for (i in 1:n_lists) {
+  for (i in seq_len(n_lists)) {
     current_list <- lists[[i]]
     trial_type <- ifelse(separate_items, paste0(current_list[["type"]][[1L]], "_"), "")
 

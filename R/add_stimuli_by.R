@@ -60,7 +60,7 @@ add_stimuli_by <- function(design, ...) {
 
 .set_stimuli_printmsg <- function(design) {
   new_printmsg <- "Each trial presents these stimuli:\n"
-  for (i in 1:length(design[["stimuli"]])) {
+  for (i in seq_len(length(design[["stimuli"]]))) {
     new_printmsg <- paste0(new_printmsg, attr(design[["stimuli"]][[i]], "printmsg"))
   }
   attr(design$stimuli, "printmsg") <- new_printmsg
@@ -122,7 +122,7 @@ add_stimuli_by <- function(design, ...) {
 
     # Compose an expand.grid call with all the crossed manipulations
     eg_call <- list(quote(expand.grid))
-    for (i in 1:length(manips)) {
+    for (i in seq_len(length(manips))) {
       eg_call[[i + 1L]] <- design[["manipulations"]][[manips[i]]]
     }
     grid <- eval(as.call(eg_call))
@@ -192,11 +192,11 @@ add_stimuli_by <- function(design, ...) {
 .make_presentation <- function(design, manipulation, columns) {
   # Extract ordering for this manipulation, and get the number to present
   ordering <- design[["orderings"]][[manipulation]]
-  order_nums <- 1:length(ordering)
+  order_nums <- seq_len(length(ordering))
   # For each of the columns to add, append 1:order_nums
   add_cols <-
-    as.vector(
-      sapply(columns,
+    unlist(
+      lapply(columns,
              FUN = function(x) paste(x, order_nums, sep = "_")
       )
     )
@@ -271,10 +271,10 @@ add_stimuli_by <- function(design, ...) {
   none_specified <- all(is.na(order_nums))
 
   if (!none_specified) {
-    order_nums <- 1:max(order_nums, na.rm = T)
+    order_nums <- seq_len(max(order_nums, na.rm = T))
     numbered_cols <-
-      as.vector(
-        sapply(columns,
+      unlist(
+        lapply(columns,
                FUN = function(x) paste(x, order_nums, sep = "_")
         )
       )

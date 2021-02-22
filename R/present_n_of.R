@@ -24,7 +24,7 @@ present_n_of <- function(design, manipulation, n) {
   perm_matrix <- data.frame(permutations(length(conditions), r = n, conditions))
 
   # Set names of each column in the matrix to manipulation_1...n
-  choice_names <- vapply(1:n,
+  choice_names <- vapply(seq_len(n),
     FUN = function(x) paste(manipulation, x, sep = "_"),
     FUN.VALUE = "character"
   )

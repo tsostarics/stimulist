@@ -7,7 +7,7 @@
 add_items <- function(design, ...) {
   design[["items"]] <- list(...)
   attr(design[["items"]], "total") <- sum(unlist(design[["items"]]))
-  for (i in 1:length(design[["items"]])) {
+  for (i in seq_len(length(design[["items"]]))) {
     attr(design[["items"]][[i]], "labels") <- ""
     attr(design[["items"]][[i]], "labelled") <- FALSE
   }
@@ -17,7 +17,7 @@ add_items <- function(design, ...) {
 .set_items_printmsg <- function(design) {
   new_printmsg <- paste0(attr(design$items, "total"), " items total:\n")
 
-  for (i in 1:length(design[["items"]])) {
+  for (i in seq_len(length(design[["items"]]))) {
     new_printmsg <-
       paste0(
         new_printmsg,

@@ -38,7 +38,7 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE) {
     fill_vars <- .get_containing_vars(design[["complete_experiment"]], f[[2]])
     glue_strings <- .expand_glue(f[[3]], glue_dependencies, fill_vars, as_levels)
 
-    for (i in 1:length(fill_vars)) {
+    for (i in seq_len(length(fill_vars))) {
       design[["complete_experiment"]][[fill_vars[i]]] <- glue::glue(glue_strings[i], .envir = design[["complete_experiment"]])
     }
   }

@@ -41,7 +41,7 @@ counterbalance <- function(design, method = "latinsquare") {
 .set_counterbalance_printmsg <- function(design) {
   n_lists <- max(design[["counterbalance"]])
   new_printmsg <- paste0(n_lists, " stimulus lists total, counterbalanced by:\n")
-  for (i in 1:length(design$manipulations)) {
+  for (i in seq_len(length(design$manipulations))) {
     if (attr(design[["manipulations"]][[i]], "has_order")) {
       n <- attr(design[["orderings"]][[i]], "n")
       r <- attr(design[["orderings"]][[i]], "r")
@@ -64,12 +64,12 @@ counterbalance <- function(design, method = "latinsquare") {
   n_items <- attr(design[["items"]], "total")
   n_lists <- .calculate_lists(design)
 
-  assignments <- purrr::list_along(1:n_items)
-  ls_order <- 1:n_lists
+  assignments <- purrr::list_along(seq_len(n_items))
+  ls_order <- seq_len(n_lists)
   mod_n <- n_lists + 1
 
   # Procedure to create latinsquare groups
-  for (i in 1:n_items) {
+  for (i in seq_len(n_items)) {
     assignments[[i]] <- ls_order
     ls_order <- (ls_order + 1) %% mod_n
     zero_index <- which(ls_order == 0)

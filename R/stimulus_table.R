@@ -11,11 +11,11 @@ get_stim_table <- function(design, add_id = T) {
       purrr::lmap(
         design[["items"]],
         function(x) {
-          list(data.frame(stimulus = 1:x[[1L]], type = names(x)))
+          list(data.frame(stimulus = seq_len(x[[1L]]), type = names(x)))
         }
       )
     )
-  out[["trial"]] <- 1:nrow(out)
+  out[["trial"]] <- seq_len(nrow(out))
   if (add_id) out[["tojoin"]] <- 1
   out
 }

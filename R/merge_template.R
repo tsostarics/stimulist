@@ -22,7 +22,7 @@ merge_template <- function(design, template_path) {
   to_fill <- to_fill[unlist(to_fill)]
   merge_keys <- names(dplyr::select(all_stimuli, !tidyselect::contains(names(to_fill))))
 
-  for (i in 1:length(template_sheets)) {
+  for (i in seq_len(length(template_sheets))) {
     sheet <- template_sheets[[i]]
     sheet_cols <- names(sheet)
     # This value(s) will need to be excluded from the stimuli table for joining
@@ -43,7 +43,7 @@ merge_template <- function(design, template_path) {
       template_value <- stringr::str_match(exclude_var[1L], "^(.+)_\\d$")[[2]]
       template_key <- sheet_cols[(!sheet_cols %in% merge_keys) & (!sheet_cols == template_value)]
       table_keys <- names(dplyr::select(all_stimuli, tidyselect::contains(template_key)))
-      for (j in 1:length(exclude_var)) {
+      for (j in seq_len(length(exclude_var))) {
         sheet[exclude_var[j]] <- sheet[template_value]
         sheet[table_keys[j]] <- sheet[template_key]
         all_stimuli <- merge(

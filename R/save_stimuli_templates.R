@@ -17,7 +17,7 @@ save_stimuli_templates <- function(design, as_workbook = TRUE) {
   if (as_workbook) {
     requireNamespace("xlsx", quietly = TRUE)
     wb <- xlsx::createWorkbook()
-    for (i in 1:length(stimuli)) {
+    for (i in seq_len(length(stimuli))) {
       sheet <- xlsx::createSheet(wb, filenames[i])
       to_write <- merge(get_stim_table(design), stimuli[[i]], all = F, allow.cartesian = T) ## change to merge later
       to_write$tojoin <- NULL
@@ -26,7 +26,7 @@ save_stimuli_templates <- function(design, as_workbook = TRUE) {
     xlsx::saveWorkbook(wb, "experiment_stimuli.xlsx")
     message("An excel workbook has been saved with sheets for each stimulus component.")
   } else {
-    for (i in 1:length(stimuli)) {
+    for (i in seq_len(length(stimuli))) {
       this_file <- paste0(filenames[i], ".csv")
       write.csv(to_write, file = this_file, row.names = FALSE, na = "")
     }

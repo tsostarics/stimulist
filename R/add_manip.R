@@ -8,7 +8,7 @@ add_manipulations <- function(design, ...) {
   if ("" %in% names(list(...)))
     stop("Must provide named arguments.")
   design[["manipulations"]] <- list(...)
-  for (i in 1:length(design[["manipulations"]])) {
+  for (i in seq_len(length(design[["manipulations"]]))) {
     attr(design[["manipulations"]][[i]], "has_order") <- FALSE
   }
 
@@ -19,7 +19,7 @@ add_manipulations <- function(design, ...) {
   new_printmsg <- "Manipulations:\n"
 
   # this could be rewritten with vapply, to do later
-  for (i in 1:length(design[["manipulations"]])) {
+  for (i in seq_len(length(design[["manipulations"]]))) {
     new_printmsg <-
       paste0(
         new_printmsg,
