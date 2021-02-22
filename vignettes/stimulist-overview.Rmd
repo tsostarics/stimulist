@@ -1,0 +1,557 @@
+---
+title: "stimulist-overview"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{stimulist-overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(stimulist)
+```
+
+# Overview
+
+This package was made with the goal of making it easier to make lists of stimuli
+for behavioral experiments like those used in Linguistics and Psychology. Often
+we'll have different manipulations that aim to address some question related to
+a categorical contrast or gradient differences along some dimension, or even
+an interaction between multiple dimensions. Depending on the experiment, you may
+need to present different audio or image files depending on what the current
+manipulation of the trial is. If you're presenting multiple of the same stimuli
+on one trial, you usually need to balance the presentation orders within 
+subjects or counterbalance between subjects. You might also need to do this
+if you can't show the same item in all of its different permutations to a single
+subject.
+
+For 2x2 experiments, this may not be too difficult. However, as the number of
+items, manipulations, and interactions increase, so too does the complexity of 
+the experiment and the stimuli that are presented. Trying to consider how many
+stimulus lists to create can then become an unwanted exercise in permutations
+and combinations that's prone to overthinking and error (not to mention it's
+tedious).
+
+This package uses a tidyverse-styled approach to consider how an experiment
+is structured step by step. The goal is to computationally generate what's
+easy for a computer but annoying for researchers, while allowing researchers
+to step in and manually specify things only when needed and only *once*.
+
+For now, this package works great for more "traditional" perception and production
+studies. It doesn't work quite so well for creating lists of stimuli for
+a visual world paradigm eye-tracking study. This is something I intend on working
+on more when I have a few examples to use as a reference.
+
+# Workflow and Examples
+
+When creating lists of stimuli, we're interested in setting up these steps
+in an intuitive way:
+ - Add *manipulations* that represent the contrasts we're interested in
+ - Add *items* that instantiate those manipulations
+ - Add in *stimuli* that *vary by our manipulations*
+
+After setting up the structure of the trials in our experiment, we can then
+think of how we want to begin to fill out what's processed by our experiment
+software (ie what images, sound files, etc.  to present on a trial).
+
+## Starting a basic 2x2 experiment
+
+This test is based off of an experiment I've run myself. In a paper we might 
+describe it as follows:
+
+The experiment has a 2x2 design investigating the interaction of pitch contour
+(HLL and LLL) and context (IN and OUT). There are 12 critical items and 8 filler
+items. On each trial, participants are given a short dialogue that establishes
+the context of the trial. The dialogue is presented auditorily and provided in
+text on screen. After the preamble dialogue is complete, participants are given
+two buttons with which to listen to a one-word response that varies by pitch
+contour. Both pitch contours are available on each trial, but the mapping to the
+two buttons is counterbalanced across participants.
+
+Based on this description, we can pull out some important information:
+ - 2 manipulations: contour and context, each with 2 levels
+ - 12 critical items, 8 filler items
+ - Each trial shows a preamble text and preamble audio, which varies by context
+ - Each trial shows 2 audio responses, which vary by contour
+ - The ordering of the 2 audio responses is counterbalanced
+ 
+ Let's go step by step. First we'll create a new experiment design using
+ `new_design()`, which creates a `stimulist` object. Underlyingly it's just a
+ list of different experiment attributes that we use functions to set one by
+ one. Its `print` behavior is to describe the structure of the experiment so
+ far.
+ 
+```{r}
+new_design("Test One") 
+```
+
+We'll start big and add the manipulations we're interested in. This is done
+by providing a series of arguments with character or numeric vectors of the level
+values. For example, if you were doing a 7 step continuum of voice onset time
+(VOT) you might use `add_manipulations(VOT = 1:7)`. You can add as many as
+you want. Notice we now see our manipulations and the number of levels printed.
+
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out'))
+```
+
+Next we'll add our items, of which we have critical items and fillers. Note that
+as of now it's assumed that they'll be equally complex. So, if your fillers
+aren't quite as complex (maybe 2 different versions instead of 4 in a 2x2 design
+) you might consider having a separate pipeline for that. This will be updated
+in the future but for now we'll ignore that. Regardless, on each trial you will
+need just as much information in the fillers than your trials: you'll still need
+2 response audios, 1 preamble text, and 1 preamble audio.
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8)
+```
+
+Next we consider whether we present 1 level of a manipulation per trial, or 
+multiple. In this experiment we want to draw attention to the contrast between
+contours, so we present 2 on each trial. 
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) 
+```
+
+Note that in the code below, the new
+`present_n_of()` function doesn't print anything new quite yet. The reason is
+because the experiment is ready to present two levels of `contour`, but we
+haven't told it what stimuli we're presenting yet!
+
+Now we can add those stimuli. This takes the form of a series of *formulas*. You
+have probably used formulas in the context of `lm()` models or in `ggplot` using
+something like `facet_wrap(~x)`. Formulas allow us an easy way to specify arbitrary
+numbers of stimuli that vary by a manipulation. Later we'll see how this syntax
+is especially useful for stimuli that vary by the interaction between two
+manipulations.
+
+The formula syntax for our purposes is like so: `manipulation ~ variable`. If
+you want to add multiple variables, do something like 
+`manipulation ~ variable + another + more`. If you're adding something that varies
+by every item, but not by any manipulation, use ` ~ variable`. The reason for
+this ordering is because R wil allow formulas with empty left hand sides,
+but *not* formulas with empty right hand sides. Since our manipulations aren't
+strictly necessary, they go on the left hand side. You might read these formulas
+`a ~ b` like *a varies b* or *a determines b* or *b varies by a* for a trial.
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio)
+```
+
+Notice how the new additions to the print message aligns exactly with what we
+wanted to do. 2 response audios, but 1 preamble text and preamble audio.
+
+Now comes the part that tends to get tedious to consider. We have 2 levels of
+contour and 2 levels of context. We're interested in each contour as it appears
+in each context, since that's what we show in each trial. Thus, each item has
+4 versions. This isn't merely 2 times 2 equals 4, it's actually a product of
+permutations. We'll see why this is relevant in the next section, as it's easier
+to grasp and appreciate when you have more than 2 levels.
+
+I bring this up because we want to counterbalance across these four versions.
+Right now, the most straightforward way to do this is with a latin square, but
+other methods may be implemented in the future. We can pass our experiment to the
+`counterbalance()` function to assign items to the four lists.
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio) %>% 
+  counterbalance() 
+```
+
+Notice it tells us how the lists are counterbalanced, and how many lists 
+result from our design.
+
+At this point, we have our experiment pretty much set up from a theoretical
+standpoint. Now we get into how we turn all of our design decisions into a
+product we can use. This is straightforward, and we start with the
+`fill_experiment()` function, which will fill out our design with all the
+nuanced combinations, permutations, and products that come with it.
+
+```{r}
+new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() 
+```
+
+And here it says our completed so-called "master list" is ready! It calculates
+the total number of trials, `2*2*20 = 80`, and the total number per list, here
+`20`. We'll need to save this to a variable to inspect it first.
+
+```{r}
+testone <- new_design("Test One") %>%
+  # Add two manipulations with 2 levels
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() 
+
+head(testone$complete_experiment)
+```
+
+`fill_experiment()` fills out the `complete_experiment` data frame in the 
+`stimulist` object, which we can access as we do with lists (since a `stimulist`
+*is* a list). You can take a look at the structure of the other elements,
+but they're not particularly interesting. They're just portions of the design
+which are all combined with `fill_experiment()`.
+
+Notice though how we have all the pieces we've specified. Take the first trial
+for example. It's a critical trial where the first contour is hll and the second
+is lll and the context is in. There is space for two response audios, one
+preamble text, and one preamble audio. There's also a counterbalance assignment
+from 1 to 4 such that the "trial 1" for each list presents a different permutation
+of our manipulations.
+
+You might be thinking though, why are our variables all NA? Do we need to fill
+those out one by one? You could, but that isn't very efficient. It's likely
+that you'll settle on a naming scheme where you have, say, the item set
+and the context and the contour all in the filename. This is easy for us to
+automate, and we'll use the `glue` package to do so easily.
+
+If you're not familiar with `glue`, it essentially lets us write out strings
+that contain R code that we want to execute to programmatically generate
+strings that depend on other values. If you've never used it in `dplyr::mutate`
+you should give it a try some day. For now, just know that when we want to use
+R code or R variables, we put them in curly brackets: `"{...}"`.
+
+So lets say we have our response audio files saved in a sounds directory, they're
+all wav files, and the filenames have the item set and the contour separated by
+an underscore. We'd write this out with glue using `"sounds/{stimulus}_{contour}.wav"`.
+
+We map these glue-strings to our variables in a similar formula syntax from when
+we first created those variables in `add_stimuli_by()`. All in all we can trace
+our formulas and describe it like "Contour varies the response audio, which
+varies the filename as specified in this string."
+
+```{r}
+testone <- new_design("test") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{contour}.wav")
+
+print(testone)
+```
+
+And we can investigate like so:
+
+```{r}
+head(testone$complete_experiment)
+```
+
+Notice how `response_audio_1` and `response_audio_2` are pulling from the 
+`contour_1` and `contour_2` columns respectively, even though we never mentioned
+the numbers explicitly anywhere! It would be unfeasible and error prone to try
+and manually specify them one by one in larger designs, so the underlying
+implementation checks to see when it needs to cover multiple columns. Let's fill
+out the preamble_audio column too.
+
+```{r}
+testone <- new_design("test") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour ~ response_audio,
+                 context ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{contour}.wav",
+                    preamble_audio ~ "sounds/{stimulus}_{context}_pre.wav")
+
+print(testone)
+```
+
+The preamble text still needs to be specified, and for this we actually need to
+type out the conversations manually. We'll do this in a later section that looks
+at creating and merging templates.
+
+
+
+
+## Crossing manipulations for stimulus presentation
+
+A followup experiment to the one in the previous section was done, the theoretical
+parts are unimportant but there is a key change to the stimulus presentation.
+Rather than having the buttons play responses with one of two contours,
+the buttons play a question *and* the response with one of two contours. The
+important bit to know is that it's the question that sets up the context for
+the experiment. Thus, the input audio for the preamble is slightly shorter and
+no longer varies by context (just by item) while the input for the response
+audio now varies by contour *and context*.
+
+Recall that due to our 2x2 design, we'll need to vary the response audio based
+on both contour and context as their levels interact/pair together. That is,
+we want `response_audio` to vary by `contour*context`. This is reminiscent of
+how we would add interactions to a model, and is exactly how we enter it into
+our `add_stimuli_by()` formulas. Also recall that we can specify a stimulus
+to vary only by item by simply omitting any manipulations on the left hand
+side of the formula.
+
+```{r}
+crossed <- new_design("Crossed manipulations") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour*context ~ response_audio,
+                  ~ preamble_text + preamble_audio)
+
+print(crossed)
+```
+
+Notice how the print message now tells us that response audio varies by
+contour and by context, while the preamble variables only vary from trial to trial.
+
+We can add in the rest of the lines like before, but we'll want to respecify
+how we structure the filenames now that context is relevant.
+
+```{r}
+crossed <- new_design("Crossed manipulations") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour*context ~ response_audio,
+                  ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+
+print(crossed)
+```
+
+And we can inspect:
+
+```{r}
+head(crossed$complete_experiment)
+```
+
+Note that for anything we want to fill in with `glue`, we can utilize any
+of the information in any of the columns. Things may get longer, but it's useful
+to know.
+
+## A 3x2 design
+
+I briefly mentioned that our 2x2 design yielded 4 versions of each item: IN-HLL, 
+IN-LLL, OUT-HLL, OUT-LLL. However, we also presented each
+contour on each trial. This still results in 4 versions: IN-(HLL,LLL),
+IN-(LLL,HLL), OUT-(HLL,LLL), OUT(LLL,HLL). Keep in mind this isn't just 
+2 contexts times 2 contours = 4 anymore: it's 2 contexts times 
+*2 orderings of contour* which still equals 4. These orderings are the 
+permutations derived from picking 2 levels from 2 levels: $\frac{2!}{(2-1)!}=2*1=2$.
+The nuance between 2 times 2 and 2 pick 2 is hard to appreciate, so we'll up
+the number of levels to make it easier to see why this counterbalancing business
+gets complicated quickly.
+
+In the context of the previous experiment, let's say we're interested in an 
+additional contour: llh. This is straightforward enough, we just add it as 
+another level! The rest of our experiment is the same, so let's copy and paste
+everything from the previous section.
+
+```{r}
+three <- new_design("3x2 design") %>%
+  add_manipulations(contour = c('hll','lll', 'llh'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour*context ~ response_audio,
+                  ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+
+print(three)
+```
+
+What happened here? We added a new level to the contour manipulation, which is
+reflected in the manipulations section. However, the counterbalancing section
+shows some new calculations. Recall that before we had 2 contours and 2 contexts
+with 4 lists, because 2 times 2-pick-2 equaled 4 (confusingly 2 times 2 also
+equals 4). Here, we see *12* stimulus lists. This is definitely not 3 contours
+times 2 contexts. Rather, it's 2 contexts times 3-pick-2 orderings of contour: 
+$2*\frac{3!}{(3-2)!} = 2*\frac{3*2*1}{1} = 2*6 = 12$
+We still have 20 trials per list, but now there are 240 trials yielded from our
+manipulations-- not 120 trials. Let's see what happens if we present 3 on each
+trial (if you're good with permutations I'm sure you can guess).
+
+```{r}
+three <- new_design("3x2 design") %>%
+  add_manipulations(contour = c('hll','lll', 'llh'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 3 contours
+  present_n_of(contour, 3) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour*context ~ response_audio,
+                  ~ preamble_text + preamble_audio) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+
+print(three)
+```
+
+It's still 240 trials! The reason is because the formula for permutations is
+$\frac{n!}{(n-r)!}$ and $0!$ is equal to 1, so $\frac{3!}{0!} = \frac{3!}{1!}$.
+Why do I bring this up? I bring it up because it's important to keep in mind when
+considering the complexity of your trials. It's a tradeoff between how long you
+spend on each trial versus how many trials there are, but sometimes you can 
+increase the time spent on each trial without even cutting down on the number of
+trials. This is proven in the above example: we increased trial complexity (from
+2 contours to 3) but the total number of trials remained at 240. Thus, you should
+think critically about exactly how many contrasts you need to make salient on 
+each trial. If we wanted to treat this third level as some kind of distractor, 
+then we could add it as an additional stimulus, but not as a manipulation:
+
+```{r}
+distractor <- new_design("2x2 design with distractor") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  # Add our items
+  add_items(critical = 12,
+            filler = 8) %>%
+  # Each trial presents 2 contours
+  present_n_of(contour, 2) %>%
+  # Add response audio that varies by contour
+  # and text/audio that vary by context
+  add_stimuli_by(contour*context ~ response_audio,
+                  ~ preamble_text + preamble_audio,
+                  context ~ llh_distractor) %>% 
+  counterbalance() %>% 
+  fill_experiment() %>% 
+  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{stimulus}_pre.wav",
+                    llh_distractor ~ "sounds/{stimulus}_{context}_llh.wav")
+
+print(distractor)
+head(distractor$complete_experiment)
+```
+
+Here we've added the third level as another stimulus. Remember that in this experiment
+each contour is associated with a button on the screen. In our javascript or
+python-based experiment, we can still create three buttons, but now we're only
+worried about the ordering of the 2 levels. With this implementation, you might
+opt for 3 buttons but the middle button is always the distractor, and the left
+and right buttons are counterbalanced. This again yields 80 trials, not 240,
+because we're back to 2-pick-2 contours. Keep in mind that these decisions
+should be theoretically motivated-- why *do* you want this audio file in the
+middle at all times? 
+
+In a different experiment you might make the middle button 
+white noise and require participants to press the buttons one at a time in order, 
+or they have to press the middle button in between any time they want to listen 
+to the other button option. This package doesn't make those decisions for you,
+but it can help alert you to issues where you're predicted to have way too many
+trials than could reasonably be presented.
+
+## Cross all manipualtions to yield trials
+
+# Creating templates

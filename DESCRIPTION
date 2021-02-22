@@ -24,5 +24,8 @@ BugReports: https://github.com/tsostarics/stimulist/issues
 Suggests: 
     xlsx,
     glue,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
+VignetteBuilder: knitr

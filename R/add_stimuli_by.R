@@ -10,7 +10,6 @@
 #' @importFrom stats setNames
 add_stimuli_by <- function(design, ...) {
   formulas <- .clean_formulas(lapply(enexprs(...), as.character))
-
   for (stimset in formulas) {
 
     # If this stimulus doesn't vary by any manipulation ( ~ x)
@@ -28,7 +27,6 @@ add_stimuli_by <- function(design, ...) {
       f_manip <- stimset[[2L]] # Manipulation from lhs of formula
       is_crossed <- grepl(" \\* ", f_manip)
       f_cols <- strsplit(as.character(stimset[[3L]]), " \\+ ")[[1L]]
-
       # Create grid for the manipulation
       grid <- .create_grid(design, f_manip)
 
@@ -36,11 +34,8 @@ add_stimuli_by <- function(design, ...) {
 
       # Make empty singleton columns to bind to output
       add_cols <- setNames(as.list(rep(NA, length(f_cols))), f_cols)
-
       output <- cbind(grid, add_cols)
-
       design[["stimuli"]][[f_manip]] <- output
-
       if (is_crossed) {
         design[["presentations"]][[f_manip]] <-
           .make_crossed_presentation(
@@ -67,8 +62,8 @@ add_stimuli_by <- function(design, ...) {
 
 .set_stimuli_printmsg <- function(design) {
   new_printmsg <- "Each trial presents these stimuli:\n"
-  for (i in 1:length(design[['stimuli']])) {
-    new_printmsg <- paste0(new_printmsg, attr(design[['stimuli']][[i]], "printmsg"))
+  for (i in 1:length(design[["stimuli"]])) {
+    new_printmsg <- paste0(new_printmsg, attr(design[["stimuli"]][[i]], "printmsg"))
   }
   attr(design$stimuli, "printmsg") <- new_printmsg
   design
@@ -147,44 +142,53 @@ add_stimuli_by <- function(design, ...) {
 
 .clean_formulas <- function(formulas) {
   formula_lengths <- vapply(formulas, length, 1L)
-  if (any(formula_lengths > 3 | formula_lengths < 2))
+  if (any(formula_lengths > 3 | formula_lengths < 2)) {
     stop("Malformed formula")
+  }
 
   # Handle one sided formulas
-  no_lhs <- vapply(tst, function(x) length(x) == 2, T)
-  combined_onesided <-
-    c("~",
+  no_lhs <- vapply(formulas, function(x) length(x) == 2, T)
+  if (any(no_lhs))
+    combined_onesided <-
+    list(
+      c(
+      "~",
       paste0(
         vapply(
           formulas[no_lhs],
-          function(x) x[[2]], 'char'
+          function(x) x[[2]], "char"
         ),
-        collapse = ' + '
+        collapse = " + "
       )
     )
+    )
+  else
+    combined_onesided <- list()
 
   # Handle two sided formulas
   # Get all the variables given in the lhs of the formulas
-  lhs <-  unique(vapply(formulas[!no_lhs], function(x) x[[2]], 'char'))
+  lhs <- unique(vapply(formulas[!no_lhs], function(x) x[[2]], "char"))
   combined_twosided <-
     # For each lhs variable, combine into one formula
-    purrr::lmap(lhs,
-                function(x){
-                  rhs <- vapply(formulas,
-                                function(y)
-                                  ifelse(y[[2]] == x, # LHS given in 2nd element
-                                         y[[3]], # RHS given in 3rd element
-                                         character(0)
-                                  ),
-                                "char"
-                  )
-                  rhs <- rhs[!is.na(rhs)]
-                  list(c("~", x, paste0(rhs, collapse = " + ")))
-                }
+    purrr::lmap(
+      lhs,
+      function(x) {
+        rhs <- vapply(
+          formulas,
+          function(y) {
+            ifelse(y[[2]] == x, # LHS given in 2nd element
+                   y[[3]], # RHS given in 3rd element
+                   character(0)
+            )
+          },
+          "char"
+        )
+        rhs <- rhs[!is.na(rhs)]
+        list(c("~", x, paste0(rhs, collapse = " + ")))
+      }
     )
 
-  c(list(combined_onesided), combined_twosided)
-
+  c(combined_onesided, combined_twosided)
 }
 
 .make_presentation <- function(design, manipulation, columns) {
@@ -227,7 +231,7 @@ add_stimuli_by <- function(design, ...) {
     purrr::lmap(
       orderings,
       function(x) {
-        x[[1]][['tojoin']] <- 1
+        x[[1]][["tojoin"]] <- 1
         x
       }
     )

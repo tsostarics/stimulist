@@ -108,4 +108,8 @@ test_that("clean formulas works", {
     c(~ four + five, one ~ two + three, six ~ seven) %>%
       lapply(as.character)
   )
+  expect_equal(
+    .clean_formulas(list(c("~", "contour", "response_audio"))),
+    list(c("~", "contour", "response_audio"))
+  )
 })
