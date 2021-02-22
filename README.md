@@ -3,7 +3,7 @@
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/tsostarics/stimulist/workflows/R-CMD-check/badge.svg)](https://github.com/tsostarics/stimulist/actions)
-[![CodeFactor](https://www.codefactor.io/repository/github/tsostarics/stimulist/badge)](https://www.codefactor.io/repository/github/tsostarics/stimulist)
+[![CodeFactor](https://www.codefactor.io/repository/github/tsostarics/stimulist/badge?s=7e3ec9853f58393b33ff59b9b7c924c265ef5248)](https://www.codefactor.io/repository/github/tsostarics/stimulist)
 [![](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
