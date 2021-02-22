@@ -3,10 +3,7 @@
 #' @param design Experiment design
 #' @param add_id Whether to add an id to join by
 #'
-#' @return
 #' @export
-#'
-#' @examples
 #' @importFrom data.table rbindlist
 get_stim_table <- function(design, add_id = T) {
   out <-

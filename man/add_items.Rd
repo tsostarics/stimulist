@@ -11,9 +11,6 @@ add_items(design, ...)
 
 \item{...}{a series of named arguments with manipulation levels}
 }
-\value{
-
-}
 \description{
 Add items to experiment design
 }

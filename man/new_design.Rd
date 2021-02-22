@@ -9,9 +9,6 @@ new_design(name = "Experiment")
 \arguments{
 \item{name}{Name of the experiment}
 }
-\value{
-
-}
 \description{
 Create new design
 }

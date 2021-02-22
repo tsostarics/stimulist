@@ -11,9 +11,6 @@ save_stimuli_templates(design, as_workbook = TRUE)
 
 \item{as_workbook}{Whether to save as an excel workbook or not}
 }
-\value{
-
-}
 \description{
 After adding stimuli with add_stimuli_by(), this will save .csv files for
 you to fill in in excel. The completed files will be read in later to merge

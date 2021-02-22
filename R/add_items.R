@@ -3,10 +3,7 @@
 #' @param design Experiment design
 #' @param ... a series of named arguments with manipulation levels
 #'
-#' @return
 #' @export
-#'
-#' @examples
 add_items <- function(design, ...) {
   design[["items"]] <- list(...)
   attr(design[["items"]], "total") <- sum(unlist(design[["items"]]))

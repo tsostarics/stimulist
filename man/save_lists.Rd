@@ -24,9 +24,6 @@ items (eg critical and filler lists are saved separately)}
 
 \item{as_one_file}{Whether you want to save all trials as 1 file}
 }
-\value{
-
-}
 \description{
 Given a counterbalanced experiment from fill_experiment(), saves the individual
 counterbalanced lists. In the future there will be an option for JSON files

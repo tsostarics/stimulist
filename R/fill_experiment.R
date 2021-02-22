@@ -9,10 +9,7 @@
 #' @param use_as_is Whether to use all the generated combinations as trials. Use
 #' when you plan to present all of the trials to every participant.
 #'
-#' @return
 #' @export
-#'
-#' @examples
 fill_experiment <- function(design, use_as_is = F) {
   stim_table <- get_stim_table(design)
   expanded <-

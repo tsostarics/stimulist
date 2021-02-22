@@ -7,10 +7,8 @@
 #' @param design Experiment design
 #' @param as_workbook Whether to save as an excel workbook or not
 #'
-#' @return
 #' @export
 #' @importFrom utils write.csv
-#' @examples
 save_stimuli_templates <- function(design, as_workbook = TRUE) {
 
   stimuli <- design[["stimuli"]]

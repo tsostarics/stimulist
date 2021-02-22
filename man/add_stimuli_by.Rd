@@ -12,9 +12,6 @@ add_stimuli_by(design, ...)
 \item{...}{A series of formulas where the left hand side is a manipulation
 and the right hand side is a series of variable names}
 }
-\value{
-
-}
 \description{
 Add Stimuli by Manipulations
 }

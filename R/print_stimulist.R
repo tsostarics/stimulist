@@ -3,10 +3,7 @@
 #' @param x object
 #' @param ... additional arguments
 #'
-#' @return
 #' @export
-#'
-#' @examples
 print.stimulist <- function(x, ...) {
   cat(attr(x[['name']], "printmsg"))
   cat(attr(x[['manipulations']], "printmsg"))

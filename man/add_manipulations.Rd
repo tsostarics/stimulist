@@ -11,9 +11,6 @@ add_manipulations(design, ...)
 
 \item{...}{A series of named arguments with manipulation levels}
 }
-\value{
-
-}
 \description{
 Add Experimental Manipulations
 }

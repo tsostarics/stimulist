@@ -11,10 +11,7 @@
 #' @param design Experiment design
 #' @param template_path Path to template file
 #'
-#' @return
 #' @export
-#'
-#' @examples
 merge_template <- function(design, template_path) {
   requireNamespace("xlsx", quietly = TRUE)
   all_stimuli <- design[["complete_experiment"]]

@@ -9,9 +9,6 @@ create_stimulus_list(design)
 \arguments{
 \item{design}{Experiment design}
 }
-\value{
-
-}
 \description{
 Create stimulus list
 }

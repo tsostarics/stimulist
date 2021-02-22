@@ -13,9 +13,6 @@ glue_filenames_by(design, ..., as_levels = FALSE)
 
 \item{as_levels}{Whether to use the labels or integers representing each level}
 }
-\value{
-
-}
 \description{
 Requires the {glue} package. Similar syntax to add_stimuli_by(), but here
 you're specifying a glue string for a particular stimulus. Glue strings

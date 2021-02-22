@@ -11,9 +11,6 @@ relocate_columns(design, ...)
 
 \item{...}{Series of unquoted columns to move to the far left}
 }
-\value{
-
-}
 \description{
 This is just a wrapper around dplyr::relocate to manipulate the ordering
 of columns in the complete_experiment entry. Right now it doesn't allow for

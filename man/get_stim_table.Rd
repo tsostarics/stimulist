@@ -11,9 +11,6 @@ get_stim_table(design, add_id = T)
 
 \item{add_id}{Whether to add an id to join by}
 }
-\value{
-
-}
 \description{
 Create table for stimuli
 }

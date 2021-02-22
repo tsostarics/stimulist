@@ -13,9 +13,6 @@ present_n_of(design, manipulation, n)
 
 \item{n}{Number to present}
 }
-\value{
-
-}
 \description{
 Present n of the conditions of a manipulation
 }

@@ -11,9 +11,6 @@ counterbalance(design, method = "latinsquare")
 
 \item{method}{Method for counterbalancing, defaults to latinsquare}
 }
-\value{
-
-}
 \description{
 This will counterbalance the entire experiment using a latin square approach
 by default. Right now it's actually the only method, but in the future this

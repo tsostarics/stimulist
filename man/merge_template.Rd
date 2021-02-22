@@ -11,9 +11,6 @@ merge_template(design, template_path)
 
 \item{template_path}{Path to template file}
 }
-\value{
-
-}
 \description{
 After using save_stimulus_template() to create a blank excel workbook, you
 can then fill it out with whatever file names or text you need. But,

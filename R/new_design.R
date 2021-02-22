@@ -2,10 +2,7 @@
 #'
 #' @param name Name of the experiment
 #'
-#' @return
 #' @export
-#'
-#' @examples
 new_design <- function(name = "Experiment") {
   design <-
     list(

@@ -17,10 +17,8 @@
 #' @param ... A list of formulas mapping stimuli to glue-formatted strings
 #' @param as_levels Whether to use the labels or integers representing each level
 #'
-#' @return
 #' @export
 #'
-#' @examples
 #' @importFrom rlang enexprs enquos enexpr syms ensyms
 #' @importFrom stringr str_extract str_match_all
 glue_filenames_by <- function(design, ..., as_levels = FALSE) {

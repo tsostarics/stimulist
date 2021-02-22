@@ -7,10 +7,7 @@
 #' @param design Experiment design
 #' @param ... Series of unquoted columns to move to the far left
 #'
-#' @return
 #' @export
-#'
-#' @examples
 relocate_columns <- function(design, ...) {
   if (!"complete_experiment" %in% names(design)) {
     stop("Complete experiment not found, please run fill_experiment() first")

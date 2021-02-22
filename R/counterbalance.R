@@ -9,10 +9,7 @@
 #' @param design Experiment design
 #' @param method Method for counterbalancing, defaults to latinsquare
 #'
-#' @return
 #' @export
-#'
-#' @examples
 counterbalance <- function(design, method = "latinsquare") {
   design[["counterbalance"]] <- .assign_latinsquare(design)
   .set_counterbalance_printmsg(design)

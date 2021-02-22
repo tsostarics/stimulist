@@ -4,8 +4,6 @@
 #' @param ... A series of formulas where the left hand side is a manipulation
 #' and the right hand side is a series of variable names
 #'
-#'
-#' @return
 #' @export
 #' @importFrom stats setNames
 add_stimuli_by <- function(design, ...) {

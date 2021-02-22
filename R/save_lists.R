@@ -11,10 +11,7 @@
 #' @param path Directory to save files into (default is getwd())
 #' @param as_one_file Whether you want to save all trials as 1 file
 #'
-#' @return
 #' @export
-#'
-#' @examples
 save_lists <- function(design,
                        filename = "experiment",
                        path = getwd(),

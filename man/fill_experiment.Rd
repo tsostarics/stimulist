@@ -12,9 +12,6 @@ fill_experiment(design, use_as_is = F)
 \item{use_as_is}{Whether to use all the generated combinations as trials. Use
 when you plan to present all of the trials to every participant.}
 }
-\value{
-
-}
 \description{
 After setting all the components of your experiment, generates a full table
 of all the stimuli and saves it to the complete_experiment entry of the

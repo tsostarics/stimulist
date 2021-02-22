@@ -3,10 +3,7 @@
 #' @param design Experiment design
 #' @param ... A series of named arguments with manipulation levels
 #'
-#' @return
 #' @export
-#'
-#' @examples
 add_manipulations <- function(design, ...) {
   if ("" %in% names(list(...)))
     stop("Must provide named arguments.")

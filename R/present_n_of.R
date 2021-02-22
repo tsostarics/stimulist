@@ -4,10 +4,8 @@
 #' @param manipulation Manipulation, can be quoted or unquoted
 #' @param n Number to present
 #'
-#' @return
 #' @export
 #' @importFrom gtools permutations
-#' @examples
 present_n_of <- function(design, manipulation, n) {
   # Enable unquoted argument for ease
   manipulation <- as.character(enexpr(manipulation))

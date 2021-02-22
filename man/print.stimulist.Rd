@@ -11,9 +11,6 @@
 
 \item{...}{additional arguments}
 }
-\value{
-
-}
 \description{
 Title
 }
