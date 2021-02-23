@@ -53,9 +53,9 @@ on more when I have a few examples to use as a reference.
 
 When creating lists of stimuli, we're interested in setting up these steps
 in an intuitive way:
- - Add *manipulations* that represent the contrasts we're interested in
- - Add *items* that instantiate those manipulations
- - Add in *stimuli* that *vary by our manipulations*
+- Add *manipulations* that represent the contrasts we're interested in
+- Add *items* that instantiate those manipulations
+- Add in *stimuli* that *vary by our manipulations*
 
 After setting up the structure of the trials in our experiment, we can then
 think of how we want to begin to fill out what's processed by our experiment
@@ -76,18 +76,18 @@ contour. Both pitch contours are available on each trial, but the mapping to the
 two buttons is counterbalanced across participants.
 
 Based on this description, we can pull out some important information:
- - 2 manipulations: contour and context, each with 2 levels
- - 12 critical items, 8 filler items
- - Each trial shows a preamble text and preamble audio, which varies by context
- - Each trial shows 2 audio responses, which vary by contour
- - The ordering of the 2 audio responses is counterbalanced
- 
- Let's go step by step. First we'll create a new experiment design using
- `new_design()`, which creates a `stimulist` object. Underlyingly it's just a
- list of different experiment attributes that we use functions to set one by
- one. Its `print` behavior is to describe the structure of the experiment so
- far.
- 
+- 2 manipulations: contour and context, each with 2 levels
+- 12 critical items, 8 filler items
+- Each trial shows a preamble text and preamble audio, which varies by context
+- Each trial shows 2 audio responses, which vary by contour
+- The ordering of the 2 audio responses is counterbalanced
+
+Let's go step by step. First we'll create a new experiment design using
+`new_design()`, which creates a `stimulist` object. Underlyingly it's just a
+list of different experiment attributes that we use functions to set one by
+one. Its `print` behavior is to describe the structure of the experiment so
+far.
+
 ```{r}
 new_design("Test One") 
 ```
@@ -350,8 +350,7 @@ print(testone)
 
 The preamble text still needs to be specified, and for this we actually need to
 type out the conversations manually. We'll do this in a later section that looks
-at creating and merging templates.
-
+at creating and merging templates. 
 
 
 
@@ -386,7 +385,7 @@ crossed <- new_design("Crossed manipulations") %>%
   # Add response audio that varies by contour
   # and text/audio that vary by context
   add_stimuli_by(contour*context ~ response_audio,
-                  ~ preamble_text + preamble_audio)
+                 ~ preamble_text + preamble_audio)
 
 print(crossed)
 ```
@@ -409,7 +408,7 @@ crossed <- new_design("Crossed manipulations") %>%
   # Add response audio that varies by contour
   # and text/audio that vary by context
   add_stimuli_by(contour*context ~ response_audio,
-                  ~ preamble_text + preamble_audio) %>% 
+                 ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
   glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
@@ -424,9 +423,21 @@ And we can inspect:
 head(crossed$complete_experiment)
 ```
 
-Note that for anything we want to fill in with `glue`, we can utilize any
-of the information in any of the columns. Things may get longer, but it's useful
-to know.
+One last thing to note about the glue functionality is that you should try to
+use a minimal amount of information in these filenames. Note in the example
+above that for `response_audio` we used information from `{stimulus}`, 
+`{context}`, and `{contour}` but in preamble audio we only used `{stimulus}`.
+Recall in this version of the experiment we no longer need to vary the preamble
+audio by context (this is reflected in our `add_stimuli_by()` call). Thus,
+there's no reason to include this information in the filename, as this will
+likely require duplicate files with different names that will increase the
+amount of media you'll need to preload.
+
+Right now, you'll actually get an error if you try to use `save_stimuli_template()`
+when using a gluestring that includes information that doesn't affect the
+instantiation of that stimulus. This error is thrown by `glue` itself, not
+this package, because glue will eventually look *beyond* the scope of the stimulus
+lists to find an object that matches the name.
 
 ## A 3x2 design
 
@@ -458,7 +469,7 @@ three <- new_design("3x2 design") %>%
   # Add response audio that varies by contour
   # and text/audio that vary by context
   add_stimuli_by(contour*context ~ response_audio,
-                  ~ preamble_text + preamble_audio) %>% 
+                 ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
   glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
@@ -490,7 +501,7 @@ three <- new_design("3x2 design") %>%
   # Add response audio that varies by contour
   # and text/audio that vary by context
   add_stimuli_by(contour*context ~ response_audio,
-                  ~ preamble_text + preamble_audio) %>% 
+                 ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
   glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
@@ -523,8 +534,8 @@ distractor <- new_design("2x2 design with distractor") %>%
   # Add response audio that varies by contour
   # and text/audio that vary by context
   add_stimuli_by(contour*context ~ response_audio,
-                  ~ preamble_text + preamble_audio,
-                  context ~ llh_distractor) %>% 
+                 ~ preamble_text + preamble_audio,
+                 context ~ llh_distractor) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
   glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
@@ -556,4 +567,122 @@ trials than could reasonably be presented.
 
 ## Cross all manipualtions to yield trials
 
+Consider an example from MacWhinney, Bates, and Kliegl (1984):
+
+The five factors manipulated as independent variables included languages
+(English, Italian, and German)), word orders (NVN, VNN, and NNV), animacy 
+contrasts (AA, AI, IA), stress contrasts (St0, St1, St2), and agreement
+contrasts (Ag0, Ag1, Ag2). [...] There were a total of 81 test sentences for
+each subject.
+
+Note however that each subject was only tested in a single language, which means
+there were 3 lists of 81 sentences for 243 total items. We can split these lists
+in two ways:
+- Setting the language manipulation to be a series of 3 items of length 1 with
+`add_items()`
+- Keeping the language levels as a manipulation and splitting by that manipulation
+when we save our lists using `split_lists_by()`.
+
+The second way allows us to keep the manipulations in one place. The issue we
+run into (which may change in the future if I think of a better way to fix it)
+is that our items are created by crossing all of our manipulations, not by
+having multiple "sets" of items that instantiate the same manipulations. 
+This is made explicit when we go to fill out our table with `fill_experiment()`,
+where here we've used the argument `use_as_is = TRUE`, meaning that all the 
+combinations that ensue from our manipulations comprise the full set of our
+stimuli. Typically this suggests that you plan on giving participants the entire
+set of stimuli, which is reflected in the updated print message.
+But, we still need to add a "dummy" item of length 1 for the rest of
+the functions to work, hence the `add_items(main = 1)`.  The code below will
+save 3 lists of 81 trials, one for each language.
+
+```{r}
+macwhinney <- 
+  new_design("MacWhinney, bates, and Kliegl (1984)") %>% 
+  add_manipulations(language = c("ENG", "ITA", "GER"),
+                    wordorder = c("NVN", "VNN", "NNV"),
+                    animacy = c("AA","AI","IA"),
+                    stress = c("St0", "St1", "St2"),
+                    agreement = c("Ag0","Ag1","Ag2")) %>% 
+  add_items(main = 1) %>% 
+  add_stimuli_by(language*wordorder*animacy*stress*agreement ~ sentence) %>% 
+  split_lists_by(language) %>% # used to save our 3 language specific lists
+  fill_experiment(use_as_is = TRUE) #%>% 
+  #save_lists() # not run but would save 3 .csv lists
+
+macwhinney
+```
+
+Now we'll see a useful feature of `glue_filenames_by()`. Notice what happens when
+we glue filenames with the manipulations we specified in the previous example:
+
+```{r}
+macwhinney_glue <- 
+  macwhinney %>% 
+  glue_filenames_by(sentence ~ "sounds/{language}_{wordorder}_{animacy}_{stress}_{agreement}.wav")
+
+head(macwhinney_glue$complete_experiment)
+```
+
+Notice that the filename we created includes the actual labels for each 
+manipulation. In this example each one is short, but imagine if we wrote out longer
+labels like the full name of the language or "neutralstress" for St0. If we're
+procedurally generating these files in matlab or praat, we might want something
+shorter. We can use the `as_levels` argument in `glue_filenames_by()` to use
+integer representations of each variable.
+
+```{r}
+macwhinney_glue <- 
+  macwhinney %>% 
+  glue_filenames_by(sentence ~ "sounds/{language}_{wordorder}_{animacy}_{stress}_{agreement}.wav",
+                    as_levels = TRUE)
+
+head(macwhinney_glue$complete_experiment)
+```
+
+Now the filenames are a fair bit shorter. Granted, it's up to you to keep in mind
+what each number represents, but perhaps with a smaller number of manipulations
+this might be useful. It would also be useful if you're programming your stimuli
+to present in a particular order, as you can extract the integers at a particular
+location in the filename and do arithmetic as needed. This would need to be implemented
+in your experimental software (PsychoPy, jsPsych, Ibex, etc.), as it is beyond
+the scope of this package (this package is for setup, mainly).
+
+`save_lists()` has additional arguments that affect the number of files that
+are created, so be sure to check them out.
+
 # Creating templates
+
+will do later
+
+```{r}
+new_design("test") %>%
+  add_manipulations(contour = c('hll','lll'),
+                    context = c('in','out')) %>%
+  add_items(critical = 12,
+            filler = 8) %>%
+  present_n_of(contour, 2) %>%
+  add_stimuli_by(contour*context ~ audio_file,
+                 context ~ premable_text,
+                 ~ center_audio) %>%
+  counterbalance() %>%
+  fill_experiment(use_as_is = T) %>%
+  glue_filenames_by(audio_file ~ "sound/{str_extract(type, '^.')}_{stimulus}_{context}_{contour}.wav",
+                    center_audio ~"sound/{stimulus}_llh.wav",
+                    as_levels = T) -> tst
+
+# Create template to fill out
+# tst %>% save_stimuli_templates()
+
+# Merge in our manual edits
+# tst %>%
+#   merge_template("experiment_stimuli.xlsx") -> merged
+
+# Check to see if it merged correctly
+# merged$complete_experiment
+
+# Save our lists and we're done!
+# merged %>%
+#   save_lists()
+```
+
