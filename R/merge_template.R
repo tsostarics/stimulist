@@ -65,12 +65,16 @@ merge_template <- function(design, template_path) {
 }
 
 .get_fillable <- function(filled_table) {
-  filled_table %>%
-    dplyr::summarize(dplyr::across(tidyselect::everything(), function(x) data.table::first(is.na(x))))
+    dplyr::summarize(filled_table,
+                     dplyr::across(tidyselect::everything(),
+                                   function(x)
+                                     data.table::first(is.na(x))
+                                   )
+                     )
 }
 
 .read_template <- function(template_path) {
-  sheets <- xlsx::loadWorkbook("experiment_stimuli.xlsx") %>% xlsx::getSheets()
+  sheets <- xlsx::getSheets(xlsx::loadWorkbook("experiment_stimuli.xlsx"))
   sheet_names <- names(sheets)
   rm(sheets)
 
