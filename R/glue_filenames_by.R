@@ -41,6 +41,7 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE) {
 
     for (i in seq_len(length(fill_vars))) {
       design[["complete_experiment"]][[fill_vars[i]]] <- glue::glue(glue_strings[i], .envir = design[["complete_experiment"]])
+    }
 
     # Save glue formula in the stimuli so save_stimuli_template can use it too
     which_stimulus <- vapply(design[['stimuli']], function(x) f[[2L]] %in% names(x), TRUE)
