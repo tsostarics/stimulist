@@ -21,7 +21,8 @@ save_lists <- function(design,
   if (!"complete_experiment" %in% names(design)) {
     stop("Please use fill_experiment() before trying to save lists")
   }
-  if (!"counterbalance" %in% names(design[["complete_experiment"]])) {
+  splits <- attr(design[['counterbalance']], "splits")
+  if (!"counterbalance" %in% names(design[["complete_experiment"]]) & is.null(splits)) {
     warning("No counterbalancing has been set, this will save only one list.")
     write.csv(design[["complete_experiment"]],
       paste0(path, "/", filename, ".csv"),
@@ -40,7 +41,10 @@ save_lists <- function(design,
   }
 
   groups <- "counterbalance"
-  if (separate_items) groups <- c(groups, "type")
+  if (!is.null(splits))
+    groups <- splits
+  if (separate_items)
+    groups <- c(groups, "type")
 
   lists <-
     dplyr::group_split(
