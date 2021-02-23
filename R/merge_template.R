@@ -27,7 +27,8 @@ merge_template <- function(design, template_path) {
     sheet_cols <- names(sheet)
     # This value(s) will need to be excluded from the stimuli table for joining
     exclude_var <- names(dplyr::select(to_fill, tidyselect::contains(sheet_cols)))
-
+    if (identical(exclude_var, character(0)))
+      next
     if (length(exclude_var) == 1) {
       all_stimuli <-
         merge(
@@ -35,7 +36,7 @@ merge_template <- function(design, template_path) {
             all_stimuli,
             !tidyselect::contains(exclude_var)
           ),
-          sheet
+          dplyr::select(sheet, -trial)
         )
     } else {
       # We need to join the same column on different key columns to handle
@@ -55,7 +56,11 @@ merge_template <- function(design, template_path) {
       }
     }
   }
+  printmsg <-
+    paste0(attr(design[["complete_experiment"]], 'printmsg'),
+           "Merged values from ", template_path, "\n")
   design[["complete_experiment"]] <- all_stimuli
+  attr(design[["complete_experiment"]], 'printmsg') <- printmsg
   design
 }
 
