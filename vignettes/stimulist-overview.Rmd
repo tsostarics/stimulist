@@ -552,6 +552,8 @@ to the other button option. This package doesn't make those decisions for you,
 but it can help alert you to issues where you're predicted to have way too many
 trials than could reasonably be presented.
 
+(vignette still in progress)
+
 ## Cross all manipualtions to yield trials
 
 # Creating templates

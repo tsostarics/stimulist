@@ -11,29 +11,17 @@
 #'
 #' @export
 fill_experiment <- function(design, use_as_is = F) {
-  stim_table <- get_stim_table(design)
-  expanded <-
-    merge(
-      stim_table,
-      Reduce(
-        function(x, y) {
-          merge(x, y, all = F)
-        },
-        design[["presentations"]]
-      ),
-      all = F,
-      allow.cartesian = T
-    )
-  expanded[['tojoin']] <- NULL
+  expanded <- create_stimulus_list(design)
+
   is_counterbalanced <- any(!is.na(design[["counterbalance"]]))
   # If counterbalance is specified, add to the expanded table
   if (is_counterbalanced) {
-    expanded$counterbalance <- design[["counterbalance"]]
+    expanded[['counterbalance']] <- design[["counterbalance"]]
   }
 
   if (use_as_is) {
-    expanded$trial <- seq_len(nrow(expanded))
-    attr(design$items, "printmsg") <-
+    expanded[['trial']] <- seq_len(nrow(expanded))
+    attr(design[['items']], "printmsg") <-
       paste0(nrow(expanded), " items, participants will be given the entire set of stimuli.\n")
     if (is_counterbalanced) {
       warning("You've specified counterbalancing by participant, yet you've set `use_as_is` as TRUE, suggesting a within-subjects design.")
