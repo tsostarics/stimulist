@@ -36,7 +36,7 @@ merge_template <- function(design, template_path) {
             all_stimuli,
             !tidyselect::contains(exclude_var)
           ),
-          dplyr::select(sheet, -trial)
+          dplyr::select(sheet, -"trial")
         )
     } else {
       # We need to join the same column on different key columns to handle

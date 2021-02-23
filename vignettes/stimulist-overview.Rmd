@@ -667,7 +667,7 @@ new_design("test") %>%
                  ~ center_audio) %>%
   counterbalance() %>%
   fill_experiment(use_as_is = T) %>%
-  glue_filenames_by(audio_file ~ "sound/{str_extract(type, '^.')}_{stimulus}_{context}_{contour}.wav",
+  glue_filenames_by(audio_file ~ "sound/{stringr::str_extract(type, '^.')}_{stimulus}_{context}_{contour}.wav",
                     center_audio ~"sound/{stimulus}_llh.wav",
                     as_levels = T) -> tst
 

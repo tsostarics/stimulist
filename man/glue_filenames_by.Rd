@@ -18,13 +18,8 @@ Requires the {glue} package. Similar syntax to add_stimuli_by(), but here
 you're specifying a glue string for a particular stimulus. Glue strings
 utilize {brackets} to evaluate an expression within a string. In this case,
 you'll be replacing a label in brackets with its value in the
-completed_experiment data frame. Eg:
+completed_experiment data frame.
 }
 \details{
-... %>%
-add_stimuli_by(manip1*manip2 ~ audio_file) %>%
-fill_experiment() %>%
-glue_filenames_by(audio_file ~ "sounds/{manip1}_{manip2}.wav)
-
 This must be run after using fill_experiment.
 }
