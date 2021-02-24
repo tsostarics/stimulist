@@ -11,7 +11,7 @@ get_stim_table <- function(design, add_id = T) {
       purrr::lmap(
         design[["items"]],
         function(x) {
-          list(data.frame(stimulus = seq_len(x[[1L]]), type = names(x)))
+          list(data.frame(item = seq_len(x[[1L]]), type = names(x)))
         }
       )
     )

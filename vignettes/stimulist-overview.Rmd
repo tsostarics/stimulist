@@ -287,7 +287,7 @@ R code or R variables, we put them in curly brackets: `"{...}"`.
 
 So lets say we have our response audio files saved in a sounds directory, they're
 all wav files, and the filenames have the item set and the contour separated by
-an underscore. We'd write this out with glue using `"sounds/{stimulus}_{contour}.wav"`.
+an underscore. We'd write this out with glue using `"sounds/{item}_{contour}.wav"`.
 
 We map these glue-strings to our variables in a similar formula syntax from when
 we first created those variables in `add_stimuli_by()`. All in all we can trace
@@ -309,7 +309,7 @@ testone <- new_design("test") %>%
                  context ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{contour}.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{contour}.wav")
 
 print(testone)
 ```
@@ -342,8 +342,8 @@ testone <- new_design("test") %>%
                  context ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{contour}.wav",
-                    preamble_audio ~ "sounds/{stimulus}_{context}_pre.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{contour}.wav",
+                    preamble_audio ~ "sounds/{item}_{context}_pre.wav")
 
 print(testone)
 ```
@@ -411,8 +411,8 @@ crossed <- new_design("Crossed manipulations") %>%
                  ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
-                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{item}_pre.wav")
 
 print(crossed)
 ```
@@ -425,8 +425,8 @@ head(crossed$complete_experiment)
 
 One last thing to note about the glue functionality is that you should try to
 use a minimal amount of information in these filenames. Note in the example
-above that for `response_audio` we used information from `{stimulus}`, 
-`{context}`, and `{contour}` but in preamble audio we only used `{stimulus}`.
+above that for `response_audio` we used information from `{item}`, 
+`{context}`, and `{contour}` but in preamble audio we only used `{item}`.
 Recall in this version of the experiment we no longer need to vary the preamble
 audio by context (this is reflected in our `add_stimuli_by()` call). Thus,
 there's no reason to include this information in the filename, as this will
@@ -472,8 +472,8 @@ three <- new_design("3x2 design") %>%
                  ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
-                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{item}_pre.wav")
 
 print(three)
 ```
@@ -504,8 +504,8 @@ three <- new_design("3x2 design") %>%
                  ~ preamble_text + preamble_audio) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
-                    preamble_audio ~ "sounds/{stimulus}_pre.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{item}_pre.wav")
 
 print(three)
 ```
@@ -538,9 +538,9 @@ distractor <- new_design("2x2 design with distractor") %>%
                  context ~ llh_distractor) %>% 
   counterbalance() %>% 
   fill_experiment() %>% 
-  glue_filenames_by(response_audio ~ "sounds/{stimulus}_{context}_{contour}.wav",
-                    preamble_audio ~ "sounds/{stimulus}_pre.wav",
-                    llh_distractor ~ "sounds/{stimulus}_{context}_llh.wav")
+  glue_filenames_by(response_audio ~ "sounds/{item}_{context}_{contour}.wav",
+                    preamble_audio ~ "sounds/{item}_pre.wav",
+                    llh_distractor ~ "sounds/{item}_{context}_llh.wav")
 
 print(distractor)
 head(distractor$complete_experiment)
@@ -667,8 +667,8 @@ new_design("test") %>%
                  ~ center_audio) %>%
   counterbalance() %>%
   fill_experiment(use_as_is = T) %>%
-  glue_filenames_by(audio_file ~ "sound/{stringr::str_extract(type, '^.')}_{stimulus}_{context}_{contour}.wav",
-                    center_audio ~"sound/{stimulus}_llh.wav",
+  glue_filenames_by(audio_file ~ "sound/{stringr::str_extract(type, '^.')}_{item}_{context}_{contour}.wav",
+                    center_audio ~"sound/{item}_llh.wav",
                     as_levels = T) -> tst
 
 # Create template to fill out
