@@ -15,9 +15,9 @@ add_stimuli_by <- function(design, ...) {
       f_cols <- strsplit(stimset[[2L]], " \\+ ")[[1L]]
       add_cols <- purrr::lmap(f_cols, function(x) setNames(list(NA), x))
       output <- cbind(data.frame(tojoin = 1), add_cols)
-      design[["stimuli"]][["constant_for_all"]] <- output
-      design[["presentations"]][["constant_for_all"]] <- output
-      design <- .set_stimulus_printmsg(design, "constant_for_all", f_cols)
+      design[["stimuli"]][["item_constants"]] <- output
+      design[["presentations"]][["item_constants"]] <- output
+      design <- .set_stimulus_printmsg(design, "item_constants", f_cols)
     }
     else {
       # For stimuli that vary by a manipulation (manip ~ x + y + z...)
@@ -68,7 +68,7 @@ add_stimuli_by <- function(design, ...) {
 }
 
 .set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE) {
-  if (stimulus == "constant_for_all") {
+  if (stimulus == "item_constants") {
     new_printmsg <- paste0("  1 of ",
                            to_add,
                            ", which only varies by trial.\n",
