@@ -18,4 +18,4 @@ You can install the released version of stimulist from [Github](https://github.c
 devtools::install_github("tsostarics/stimulist")
 ```
 
-
+You can view the `stimulist-overview` vignette for some examples (though this is still a work in progress).
