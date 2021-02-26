@@ -26,7 +26,7 @@ counterbalance <- function(design, method = "latinsquare") {
       c(
         unlist(
           strsplit(crossed_presentations, " x ")[[1]],
-          "constant_for_all"
+          "item_constants"
         )
       )
     reduced_presentations <- presentations[!presentations %in% manips_to_check]
