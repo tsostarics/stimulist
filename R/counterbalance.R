@@ -43,10 +43,11 @@ counterbalance <- function(design, method = "latinsquare") {
   new_printmsg <- paste0(n_lists, " stimulus lists total, counterbalanced by:\n")
   for (i in seq_len(length(design$manipulations))) {
     if (attr(design[["manipulations"]][[i]], "has_order")) {
-      n <- attr(design[["orderings"]][[i]], "n")
-      r <- attr(design[["orderings"]][[i]], "r")
+      manipulation_name <- names(design[["manipulations"]][i])
+      n <- attr(design[["orderings"]][[manipulation_name]], "n")
+      r <- attr(design[["orderings"]][[manipulation_name]], "r")
       ps <- factorial(n) / factorial(n - r)
-      stimulus <- names(design[["orderings"]][i])
+      stimulus <- names(design[["orderings"]][manipulation_name])
       new_printmsg <- paste0(new_printmsg, "  ", n, "-pick-", r, "=", ps, " permutations of ", stimulus, ".\n")
     }
     else {
