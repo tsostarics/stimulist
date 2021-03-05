@@ -11,9 +11,6 @@ label_trials(design, ...)
 
 \item{...}{series of item = labels specifications}
 }
-\value{
-
-}
 \description{
 Label trials
 }

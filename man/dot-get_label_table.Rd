@@ -7,7 +7,7 @@
 .get_label_table(design)
 }
 \arguments{
-\item{design}{}
+\item{design}{Experiment design}
 }
 \description{
 This is used to create a table of labels and their respective items to left

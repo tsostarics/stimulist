@@ -3,13 +3,11 @@
 #' This is used to create a table of labels and their respective items to left
 #' join in to the final table
 #'
-#' @param design
+#' @param design Experiment design
 #'
 #' @export
-#'
-#' @examples
 .get_label_table <- function(design) {
-  labelled_items <- vapply(term$items, function(x) attr(x, 'labelled'), TRUE)
+  labelled_items <- vapply(design[['items']], function(x) attr(x, 'labelled'), TRUE)
 
   rbindlist(
     purrr::lmap(design[['items']][labelled_items],
@@ -26,5 +24,5 @@
 }
 
 .any_labels <- function(design){
-  any(vapply(term$items, function(x) attr(x, 'labelled'), TRUE))
+  any(vapply(design[['items']], function(x) attr(x, 'labelled'), TRUE))
 }

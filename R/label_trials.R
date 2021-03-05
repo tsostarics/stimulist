@@ -3,10 +3,7 @@
 #' @param design Experiment Design
 #' @param ... series of item = labels specifications
 #'
-#' @return
 #' @export
-#'
-#' @examples
 label_trials <- function(design, ...){
   user_labels <- list(...)
 
