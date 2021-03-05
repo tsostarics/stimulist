@@ -10,7 +10,7 @@
 #' @export
 #' @importFrom utils write.csv
 save_stimuli_templates <- function(design, as_workbook = TRUE) {
-
+  exp_name <- paste0(design[["name"]],"_stimuli")
   stimuli <- design[["stimuli"]]
   filenames <- names(stimuli)
 
@@ -30,7 +30,7 @@ save_stimuli_templates <- function(design, as_workbook = TRUE) {
         to_write[[glueformula[[2]]]] <-  glue::glue(glueformula[[3]], .envir = to_write)
       xlsx::addDataFrame(to_write, sheet = sheet, row.names = FALSE)
     }
-    xlsx::saveWorkbook(wb, "experiment_stimuli.xlsx")
+    xlsx::saveWorkbook(wb, paste0(exp_name, ".xlsx"))
     message("An excel workbook has been saved with sheets for each stimulus component.")
   } else {
     for (i in seq_len(length(stimuli))) {

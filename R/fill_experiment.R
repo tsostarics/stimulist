@@ -27,6 +27,10 @@ fill_experiment <- function(design, use_as_is = F) {
       warning("You've specified counterbalancing by participant, yet you've set `use_as_is` as TRUE, suggesting a within-subjects design.")
     }
   }
+
+  if (.any_labels(design))
+    expanded <- merge(expanded, .get_label_table(design), by = c("item", "type"))
+
   design[["complete_experiment"]] <- expanded
   .set_fill_printmsg(design, is_counterbalanced)
 }

@@ -6,7 +6,7 @@
 \usage{
 save_lists(
   design,
-  filename = "experiment",
+  filename = design[["name"]],
   path = getwd(),
   separate_items = FALSE,
   as_one_file = FALSE

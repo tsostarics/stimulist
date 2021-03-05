@@ -13,7 +13,7 @@
 #'
 #' @export
 save_lists <- function(design,
-                       filename = "experiment",
+                       filename = design[["name"]],
                        path = getwd(),
                        separate_items = FALSE,
                        as_one_file = FALSE) {
@@ -25,16 +25,16 @@ save_lists <- function(design,
   if (!"counterbalance" %in% names(design[["complete_experiment"]]) & is.null(splits)) {
     warning("No counterbalancing has been set, this will save only one list.")
     write.csv(design[["complete_experiment"]],
-      paste0(path, "/", filename, ".csv"),
-      row.names = F
+              paste0(path, "/", filename, ".csv"),
+              row.names = F
     )
     return(NULL)
   }
 
   if (as_one_file) {
     write.csv(design[["complete_experiment"]],
-      "stimulus_list.csv",
-      row.names = F
+              "stimulus_list.csv",
+              row.names = F
     )
     message("Wrote 1 .csv file with all stimuli successfully.")
     return(NULL)
@@ -47,12 +47,12 @@ save_lists <- function(design,
     groups <- c(groups, "type")
 
   lists <-
-    dplyr::group_split(
-      dplyr::group_by(
-        design[["complete_experiment"]],
-        !!!syms(groups)
+      dplyr::group_split(
+        dplyr::group_by(
+          design[["complete_experiment"]],
+          !!!syms(groups)
+        )
       )
-    )
 
   n_types <- length(unique(design[["complete_experiment"]][["type"]]))
   n_lists <- length(lists)
@@ -62,15 +62,15 @@ save_lists <- function(design,
   } # Allows for better numbering
 
   for (i in seq_len(n_lists)) {
-    current_list <- lists[[i]]
+    current_list <- lists[[i]][order(lists[[i]][['trial']]),]
     trial_type <- ifelse(separate_items, paste0(current_list[["type"]][[1L]], "_"), "")
 
     # note: maybe there should be a check to see if the / is included. getwd
     # doesn't include it but a user might provide it manually.
     write.csv(current_list,
-      paste0(path, "/", trial_type, filename, "_", file_labels[i], ".csv"),
-      na = "",
-      row.names = F
+              paste0(path, "/", trial_type, filename, "_", file_labels[i], ".csv"),
+              na = "",
+              row.names = F
     )
   }
   message(paste0("Successfully wrote ", length(lists), " lists."))
