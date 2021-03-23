@@ -13,7 +13,7 @@ RoxygenNote: 7.1.1
 Imports: 
     gtools,
     magrittr,
-    rlang,
+    rlang (>= 0.1.2),
     data.table,
     stringr,
     dplyr,
@@ -26,6 +26,8 @@ Suggests:
     glue,
     testthat (>= 3.0.0),
     knitr,
-    rmarkdown
+    rmarkdown,
+    jsonlite,
+    roxygen2
 Config/testthat/edition: 3
 VignetteBuilder: knitr

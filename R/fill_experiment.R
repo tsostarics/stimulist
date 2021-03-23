@@ -31,7 +31,7 @@ fill_experiment <- function(design, use_as_is = F) {
   if (.any_labels(design))
     expanded <- merge(expanded, .get_label_table(design), by = c("item", "type"))
 
-  design[["complete_experiment"]] <- expanded
+  design[["complete_experiment"]] <- as.data.frame(expanded)
   .set_fill_printmsg(design, is_counterbalanced)
 }
 

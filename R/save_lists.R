@@ -21,15 +21,15 @@ save_lists <- function(design,
   if (!"complete_experiment" %in% names(design)) {
     stop("Please use fill_experiment() before trying to save lists")
   }
-  splits <- attr(design[['counterbalance']], "splits")
-  if (!"counterbalance" %in% names(design[["complete_experiment"]]) & is.null(splits)) {
-    warning("No counterbalancing has been set, this will save only one list.")
-    write.csv(design[["complete_experiment"]],
-              paste0(path, "/", filename, ".csv"),
-              row.names = F
-    )
-    return(NULL)
-  }
+  # splits <- attr(design[['counterbalance']], "splits")
+  # if (!"counterbalance" %in% names(design[["complete_experiment"]]) & is.null(splits)) {
+  #   warning("No counterbalancing has been set, this will save only one list.")
+  #   write.csv(design[["complete_experiment"]],
+  #             paste0(path, "/", filename, ".csv"),
+  #             row.names = F
+  #   )
+  #   return(NULL)
+  # }
 
   if (as_one_file) {
     write.csv(design[["complete_experiment"]],
@@ -40,26 +40,10 @@ save_lists <- function(design,
     return(NULL)
   }
 
-  groups <- "counterbalance"
-  if (!is.null(splits))
-    groups <- splits
-  if (separate_items)
-    groups <- c(groups, "type")
-
-  lists <-
-      dplyr::group_split(
-        dplyr::group_by(
-          design[["complete_experiment"]],
-          !!!syms(groups)
-        )
-      )
-
-  n_types <- length(unique(design[["complete_experiment"]][["type"]]))
+  lists <- .split_stimulist(design, separate_items)
   n_lists <- length(lists)
-  file_labels <- seq_len(n_lists)
-  if (separate_items) {
-    file_labels <- ceiling(file_labels / n_types)
-  } # Allows for better numbering
+  file_labels <- .get_file_labels(design, n_lists, separate_items)
+
 
   for (i in seq_len(n_lists)) {
     current_list <- lists[[i]][order(lists[[i]][['trial']]),]
@@ -76,3 +60,41 @@ save_lists <- function(design,
   message(paste0("Successfully wrote ", length(lists), " lists."))
   NULL
 }
+
+.split_stimulist <- function(design, separate_items) {
+  splits <- attr(design[['counterbalance']], "splits")
+
+
+  groups <- "counterbalance"
+  if (!is.null(splits))
+    groups <- splits
+  if (separate_items)
+    groups <- c(groups, "type")
+
+  lists <-
+    dplyr::group_split(
+      dplyr::group_by(
+        design[["complete_experiment"]],
+        !!!syms(groups)
+      )
+    )
+
+  lists
+}
+
+.get_file_labels <- function(design, num_lists, separate_items) {
+  n_types <- length(unique(design[["complete_experiment"]][["type"]]))
+  file_labels <- seq_len(num_lists)
+  if (separate_items) {
+    file_labels <- ceiling(file_labels / n_types)
+  } # Allows for better numbering
+
+  file_labels
+}
+
+
+
+
+
+
+
