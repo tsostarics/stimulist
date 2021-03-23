@@ -31,8 +31,8 @@ save_json <- function(design,
     message("Successfully wrote 1 .js file.")
     invisible(NULL)
   }
-
-  lists <- .split_stimulist(design, separate_items)
+  splits <- attr(design[['counterbalance']], "splits")
+  lists <- .split_stimulist(nested_df, splits, separate_items)
   n_lists <- length(lists)
   file_labels <- .get_file_labels(design, n_lists, separate_items)
 

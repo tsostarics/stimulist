@@ -21,7 +21,7 @@ save_lists <- function(design,
   if (!"complete_experiment" %in% names(design)) {
     stop("Please use fill_experiment() before trying to save lists")
   }
-  # splits <- attr(design[['counterbalance']], "splits")
+  splits <- attr(design[['counterbalance']], "splits")
   # if (!"counterbalance" %in% names(design[["complete_experiment"]]) & is.null(splits)) {
   #   warning("No counterbalancing has been set, this will save only one list.")
   #   write.csv(design[["complete_experiment"]],
@@ -40,7 +40,7 @@ save_lists <- function(design,
     return(NULL)
   }
 
-  lists <- .split_stimulist(design, separate_items)
+  lists <- .split_stimulist(design[["complete_experiment"]], splits, separate_items)
   n_lists <- length(lists)
   file_labels <- .get_file_labels(design, n_lists, separate_items)
 
@@ -61,9 +61,7 @@ save_lists <- function(design,
   NULL
 }
 
-.split_stimulist <- function(design, separate_items) {
-  splits <- attr(design[['counterbalance']], "splits")
-
+.split_stimulist <- function(design_exp, splits, separate_items) {
 
   groups <- "counterbalance"
   if (!is.null(splits))
@@ -74,7 +72,7 @@ save_lists <- function(design,
   lists <-
     dplyr::group_split(
       dplyr::group_by(
-        design[["complete_experiment"]],
+        design_exp,
         !!!syms(groups)
       )
     )
