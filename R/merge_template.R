@@ -27,9 +27,11 @@ merge_template <- function(design, template_path) {
     sheet_cols <- names(sheet)
     # This value(s) will need to be excluded from the stimuli table for joining
     exclude_var <- names(dplyr::select(to_fill, tidyselect::contains(sheet_cols)))
-    if (identical(exclude_var, character(0)))
+    template_value <- stringr::str_match(exclude_var[1L], "^(.+)_\\d$")[[2]]
+
+    if (!any(sheet_cols %in% names(to_fill)))
       next
-    if (length(exclude_var) == 1) {
+    if (length(exclude_var) == 1 | is.na(template_value)) {
       all_stimuli <-
         merge(
           dplyr::select(
@@ -41,7 +43,6 @@ merge_template <- function(design, template_path) {
     } else {
       # We need to join the same column on different key columns to handle
       # instances where present_n_of() has been used.
-      template_value <- stringr::str_match(exclude_var[1L], "^(.+)_\\d$")[[2]]
       template_key <- sheet_cols[(!sheet_cols %in% merge_keys) & (!sheet_cols == template_value)]
       table_keys <- names(dplyr::select(all_stimuli, tidyselect::contains(template_key)))
       for (j in seq_len(length(exclude_var))) {
@@ -74,7 +75,7 @@ merge_template <- function(design, template_path) {
 }
 
 .read_template <- function(template_path) {
-  sheets <- xlsx::getSheets(xlsx::loadWorkbook("experiment_stimuli.xlsx"))
+  sheets <- xlsx::getSheets(xlsx::loadWorkbook(template_path))
   sheet_names <- names(sheets)
   rm(sheets)
 

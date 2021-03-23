@@ -23,7 +23,14 @@ save_stimuli_templates <- function(design, as_workbook = TRUE) {
       # Read the glueformula attribute from each stimulus
       glueformula <- attr(stimuli[[i]], "glueformula")
       # Expand the full set of stimuli we need
-      to_write <- merge(get_stim_table(design), stimuli[[i]], all = F, allow.cartesian = T)
+      to_write <- merge(get_stim_table(design),
+                        stimuli[[i]], all = F,
+                        allow.cartesian = T)
+      to_write <- merge(.get_label_table(design),
+                        to_write,
+                        by = c('item','type'),
+                        all = F,
+                        allow.cartesian = T)
       to_write$tojoin <- NULL
       # If there's a glue formula already specified, fill the column with it
       if (!is.null(glueformula))
