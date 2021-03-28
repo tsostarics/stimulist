@@ -8,16 +8,21 @@
 #' If x and y are greater than length 1 for some reason, they will be converted
 #' to an an array within the audio object.
 #'
+#' If you use a .js extension, it will save a javascript file with the list
+#' saved to the object name given with objectname. Using .json will prevent this.
+#'
 #' @param design Experimental design
 #' @param filename Filename you want to use for each list (number will be appended)
 #' @param objectname Name you want to use for the js object in the file
 #' @param separate_items Should different item types be saved in separate files
 #' @param as_one_file Should all stimuli be saved as one file (NOT recommended)
+#' @param extension File extension, defaults to .js
 #'
 #' @export
 save_json <- function(design,
                       filename = gsub(" ", "_", design[["name"]]),
                       objectname = "stimulist",
+                      extension = ".json",
                       separate_items = FALSE,
                       as_one_file = FALSE) {
   requireNamespace("jsonlite", quietly = TRUE)
@@ -27,10 +32,12 @@ save_json <- function(design,
   nested_df <- .nest_columns(design, nested_cols)
 
   if (!counterbalanced | as_one_file) {
-    .save_json_list(nested_df, filename, objectname)
-    message("Successfully wrote 1 .js file.")
+    .save_json_list(nested_df, filename, objectname, extension)
+    message(paste0("Successfully wrote 1 ", extension, " file."))
     invisible(NULL)
   }
+
+  # Split the individual trial lists up
   splits <- attr(design[['counterbalance']], "splits")
   lists <- .split_stimulist(nested_df, splits, separate_items)
   n_lists <- length(lists)
@@ -39,23 +46,28 @@ save_json <- function(design,
   for (i in seq_len(n_lists)) {
     current_type <- ifelse(separate_items, lists[[i]][["type"]][[1L]], "")
     file_label <- file_labels[[i]]
-    out_file <- paste0(filename, "_", current_type, "_", file_label, ".js")
+    out_file <- paste0(filename, "_", current_type, "_", file_label, extension)
 
     .save_json_list(lists[[i]],
                     filename = out_file,
-                    objectname = paste(objectname, current_type, file_label, sep = "_")
+                    objectname = paste(objectname, current_type, file_label, sep = "_"),
+                    extension
     )
   }
 
-  message(paste0("Successfully wrote ", n_lists, " .js files."))
+  message(paste0("Successfully wrote ", n_lists, " ", extension, " files."))
   invisible(NULL)
 }
 
-.save_json_list <- function(list_df, filename, objectname) {
+.save_json_list <- function(list_df, filename, objectname, extension) {
   json_data <- jsonlite::toJSON(list_df, auto_unbox = T, pretty = T)
   fileConn <- file(filename, "w") # Must denote w or append won't work
-  write(x = paste0(objectname, " = "), file = fileConn)
-  write(x = json_data, file = fileConn, append = TRUE)
+  to_append = TRUE
+  if (extension == ".js"){
+    write(x = paste0(objectname, " = "), file = fileConn)
+    to_append = FALSE
+  }
+  write(x = json_data, file = fileConn, append = to_append)
   close(fileConn)
 }
 
@@ -90,7 +102,7 @@ save_json <- function(design,
       function(x) {
         design[["complete_experiment"]] %>%
           dplyr::transmute(!!x := purrr::transpose(
-            .[grepl(paste0("^", x), names(.))] # Mutate won't let use use .keep here
+            .[grepl(paste0("^", x), names(.))] # Mutate won't let us use .keep here
           )
           )
       }
