@@ -29,7 +29,7 @@ save_json <- function(design,
   counterbalanced <- "counterbalance" %in% names(design[["complete_experiment"]])
 
   nested_cols <- .get_nested_cols(design)
-  nested_df <- .nest_columns(design, nested_cols)
+  nested_df <- .nest_columns(design[["complete_experiment"]], nested_cols)
 
   if (!counterbalanced | as_one_file) {
     .save_json_list(nested_df, filename, objectname, extension)
@@ -63,7 +63,7 @@ save_json <- function(design,
   json_data <- jsonlite::toJSON(list_df, auto_unbox = T, pretty = T)
   fileConn <- file(filename, "w") # Must denote w or append won't work
   to_append = TRUE
-  if (extension == ".js"){
+  if (extension == ".js") {
     write(x = paste0(objectname, " = "), file = fileConn)
     to_append = FALSE
   }
@@ -93,24 +93,24 @@ save_json <- function(design,
 }
 
 
-.nest_columns <- function(design, group_cols) {
+.nest_columns <- function(full_table, group_cols) {
   # Takes columns like audio_1 and audio_2 and combines them into a
   # list column called audio. Allows us to export an embedded js object.
   nested_dfs <-
     lapply(
       group_cols,
       function(x) {
-        design[["complete_experiment"]] %>%
-          dplyr::transmute(!!x := purrr::transpose(
-            .[grepl(paste0("^", x), names(.))] # Mutate won't let us use .keep here
-          )
-          )
+        dplyr::transmute(full_table,
+                         !!x := purrr::transpose(
+                           full_table[grepl(paste0("^", x), names(full_table))] # Transmute won't let us use .keep here
+                         )
+        )
       }
     )
 
   cbind(
     dplyr::select(
-      design[["complete_experiment"]],
+      full_table,
       !tidyselect::starts_with(group_cols)
     ),
     nested_dfs

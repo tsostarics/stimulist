@@ -8,6 +8,7 @@ save_json(
   design,
   filename = gsub(" ", "_", design[["name"]]),
   objectname = "stimulist",
+  extension = ".json",
   separate_items = FALSE,
   as_one_file = FALSE
 )
@@ -18,6 +19,8 @@ save_json(
 \item{filename}{Filename you want to use for each list (number will be appended)}
 
 \item{objectname}{Name you want to use for the js object in the file}
+
+\item{extension}{File extension, defaults to .js}
 
 \item{separate_items}{Should different item types be saved in separate files}
 
@@ -31,4 +34,8 @@ saved as an object with the stimulus name. For example, audio_1  = x
 and audio_2 = y will be converted into audio = {audio_1 = x, audio_2 = y}.
 If x and y are greater than length 1 for some reason, they will be converted
 to an an array within the audio object.
+}
+\details{
+If you use a .js extension, it will save a javascript file with the list
+saved to the object name given with objectname. Using .json will prevent this.
 }
