@@ -8,6 +8,7 @@
 #' @importFrom stats setNames
 add_stimuli_by <- function(design, ...) {
   formulas <- .clean_formulas(lapply(enexprs(...), as.character))
+  .check_if_contains(design, formulas)
   for (stimset in formulas) {
     if (length(stimset) == 2) {
       design <- .add_constant_manipulation(design, stimset)
@@ -52,10 +53,19 @@ add_stimuli_by <- function(design, ...) {
   .set_stimulus_printmsg(design, manipulation_name, formula_cols, is_crossed)
 }
 
+.check_if_contains <- function(design, formulas){
+  manipulations <- unlist(lapply(formulas, function(x) stringr::str_extract_all(x[[2]], "[^* ]+")[[1]]))
+
+  is_in_manipulations <- manipulations %in% names(design[["manipulations"]])
+  if (!all(is_in_manipulations))
+    stop(paste0(paste0(manipulations[!is_in_manipulations], collapse=", "), " not found in manipulations"))
+}
+
 .set_stimuli_printmsg <- function(design) {
-  new_printmsg <- "Each trial presents these stimuli:"
+  new_printmsg <- "Each trial presents these stimuli:\n"
   for (i in seq_len(length(design[["stimuli"]]))) {
-    new_printmsg <- glue::glue("{new_printmsg}\n{attr(design[['stimuli']][[i]], 'printmsg')}")
+    i_printmsg <- attr(design[['stimuli']][[i]], 'printmsg')
+    new_printmsg <- paste0(new_printmsg, i_printmsg)
   }
   attr(design[["stimuli"]], "printmsg") <- new_printmsg
   design
@@ -63,7 +73,7 @@ add_stimuli_by <- function(design, ...) {
 
 .set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE) {
   if (stimulus == "item_constants") {
-    new_printmsg <- glue::glue("  1 of {to_add}, which only varies by trial.\n")
+    new_printmsg <- paste0(glue::glue("  1 of {to_add}, which only varies by trial.\n",.trim = FALSE),collapse="")
   }
   else {
     stimstring <- gsub(" x ", " and ", stimulus)
@@ -77,9 +87,10 @@ add_stimuli_by <- function(design, ...) {
     )
     )
 
-    new_printmsg <- glue::glue("\t{n} of {to_add}, which varies by {stimstring}.\n")
+    new_printmsg <- paste0(glue::glue("  {n} of {to_add}, which varies by {stimstring}.\n",.trim = FALSE),collapse="")
   }
   attr(design[["stimuli"]][[stimulus]], "printmsg") <- new_printmsg
+  # print(glue::glue("stimulus   {new_printmsg}"))
   design
 }
 
