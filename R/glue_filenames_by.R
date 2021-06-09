@@ -58,10 +58,10 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE) {
   ordered_gluestrings <-
     vapply(appendages,
       function(x) {
-        gsub(regex_pattern, x, glue_string, perl = T)
+        gsub(regex_pattern, x, glue_string, perl = TRUE)
       },
       FUN.VALUE = "char",
-      USE.NAMES = F
+      USE.NAMES = FALSE
     )
 
   if (as_levels) {
@@ -76,13 +76,13 @@ glue_filenames_by <- function(design, ..., as_levels = FALSE) {
             gsub(factor_regex,
               r"({as.integer(factor()",
               x,
-              perl = T
+              perl = TRUE
             ),
-            perl = T
+            perl = TRUE
           )
         },
         FUN.VALUE = "char",
-        USE.NAMES = F
+        USE.NAMES = FALSE
       )
   }
   ordered_gluestrings

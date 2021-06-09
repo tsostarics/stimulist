@@ -34,7 +34,7 @@ save_lists <- function(design,
   if (as_one_file) {
     write.csv(design[["complete_experiment"]],
               "stimulus_list.csv",
-              row.names = F
+              row.names = FALSE
     )
     message("Wrote 1 .csv file with all stimuli successfully.")
     return(NULL)
@@ -54,7 +54,7 @@ save_lists <- function(design,
     write.csv(current_list,
               paste0(path, "/", trial_type, filename, "_", file_labels[i], ".csv"),
               na = "",
-              row.names = F
+              row.names = FALSE
     )
   }
   message(paste0("Successfully wrote ", length(lists), " lists."))

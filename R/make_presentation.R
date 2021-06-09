@@ -13,7 +13,7 @@
   none_specified <- all(is.na(order_nums))
 
   if (!none_specified) {
-    order_nums <- seq_len(max(order_nums, na.rm = T))
+    order_nums <- seq_len(max(order_nums, na.rm = TRUE))
     numbered_cols <- unlist(lapply(columns, FUN = function(x) paste(x, order_nums, sep = "_")))
     add_cols <- .make_singleton_columns(numbered_cols)
   }

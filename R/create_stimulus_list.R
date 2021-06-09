@@ -10,12 +10,12 @@ create_stimulus_list <- function(design) {
       stim_table,
       Reduce(
         function(x, y) {
-          merge(x, y, all = F)
+          merge(x, y, all = FALSE)
         },
         design[["presentations"]]
       ),
-      all = F,
-      allow.cartesian = T
+      all = FALSE,
+      allow.cartesian = TRUE
     )
   expanded[['tojoin']] <- NULL
   expanded

@@ -5,7 +5,7 @@
 #'
 #' @export
 #' @importFrom data.table rbindlist
-get_stim_table <- function(design, add_id = T) {
+get_stim_table <- function(design, add_id = TRUE) {
   out <-
     rbindlist(
       purrr::lmap(
@@ -16,6 +16,7 @@ get_stim_table <- function(design, add_id = T) {
       )
     )
   out[["trial"]] <- seq_len(nrow(out))
-  if (add_id) out[["tojoin"]] <- 1
+  if (add_id)
+    out[["tojoin"]] <- 1
   out
 }

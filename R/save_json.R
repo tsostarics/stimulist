@@ -60,7 +60,7 @@ save_json <- function(design,
 }
 
 .save_json_list <- function(list_df, filename, objectname, extension) {
-  json_data <- jsonlite::toJSON(list_df, auto_unbox = T, pretty = T)
+  json_data <- jsonlite::toJSON(list_df, auto_unbox = TRUE, pretty = TRUE)
   fileConn <- file(filename, "w") # Must denote w or append won't work
   to_append = TRUE
   if (extension == ".js") {
@@ -78,7 +78,7 @@ save_json <- function(design,
       design[["stimuli"]],
       names
     ),
-    use.names = F
+    use.names = FALSE
   )
 
   presentations <- unlist(
@@ -86,7 +86,7 @@ save_json <- function(design,
       design[["presentations"]],
       names
     ),
-    use.names = F
+    use.names = FALSE
   )
 
   stimuli[!stimuli %in% presentations]

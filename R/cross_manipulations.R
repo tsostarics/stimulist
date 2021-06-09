@@ -32,8 +32,8 @@
     )
 
 
-  merged_ordered <- Reduce(function(x, y) merge(x, y, by = "tojoin", all = T), ordered_dfs)
-  merged_unordered <- Reduce(function(x, y) merge(x, y, by = "tojoin", all = T), unordered_dfs)
+  merged_ordered <- Reduce(function(x, y) merge(x, y, by = "tojoin", all = TRUE), ordered_dfs)
+  merged_unordered <- Reduce(function(x, y) merge(x, y, by = "tojoin", all = TRUE), unordered_dfs)
 
   NO_ORDERED <- is.null(merged_ordered)
   NO_UNORDERED <- is.null(merged_unordered)
@@ -44,5 +44,5 @@
   if (NO_ORDERED) return(merged_unordered)
   if (NO_UNORDERED) return(merged_ordered)
 
-  merge(merged_unordered, merged_ordered, by = "tojoin", all = T)
+  merge(merged_unordered, merged_ordered, by = "tojoin", all = TRUE)
 }
