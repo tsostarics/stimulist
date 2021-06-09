@@ -54,7 +54,8 @@ add_stimuli_by <- function(design, ...) {
 }
 
 .check_if_contains <- function(design, formulas){
-  formulas <- formulas[vapply(formulas, length, 1L)==3]
+  # Only need to check 2 sided formulas
+  formulas <- formulas[vapply(formulas, length, 1L) == 3L]
   manipulations <- unlist(lapply(formulas, function(x) stringr::str_extract_all(x[[2]], "[^* ]+")[[1]]))
 
   is_in_manipulations <- manipulations %in% names(design[["manipulations"]])
