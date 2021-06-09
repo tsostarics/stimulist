@@ -49,16 +49,19 @@ save_lists <- function(design,
     current_list <- lists[[i]][order(lists[[i]][['trial']]),]
     trial_type <- ifelse(separate_items, paste0(current_list[["type"]][[1L]], "_"), "")
 
-    # note: maybe there should be a check to see if the / is included. getwd
-    # doesn't include it but a user might provide it manually.
     write.csv(current_list,
-              paste0(path, "/", trial_type, filename, "_", file_labels[i], ".csv"),
+              .make_path(path, trial_type, filename, file_labels, i),
               na = "",
               row.names = FALSE
     )
   }
   message(paste0("Successfully wrote ", length(lists), " lists."))
   NULL
+}
+
+.make_path <- function(path, trial_type, filename, file_labels, i) {
+  path <-  gsub("/?$","/",path)
+  paste0(path, trial_type, filename, "_", file_labels[i], ".csv")
 }
 
 .split_stimulist <- function(design_exp, splits, separate_items) {
