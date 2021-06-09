@@ -28,7 +28,7 @@
 #' Helper to make a presentation of stimuli
 #'
 #' @param design Stimulist object
-#' @param manipulations Vector of strings of manipulation names
+#' @param manipulation Manipulation names
 #' @param columns Columns to add
 #'
 .make_presentation <- function(design, manipulation, columns) {

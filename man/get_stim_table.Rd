@@ -4,7 +4,7 @@
 \alias{get_stim_table}
 \title{Create table for stimuli}
 \usage{
-get_stim_table(design, add_id = T)
+get_stim_table(design, add_id = TRUE)
 }
 \arguments{
 \item{design}{Experiment design}
