@@ -101,6 +101,8 @@ save_lists <- function(design,
       stop("Number of types is greater than one, must specify column name as string")
     replace_string <- design_tbl[['type']][[1L]]
   } else if (is.character(remove_type)) {
+    if (length(remove_type) > 1)
+      stop("Must provide a character vector of length 1 for remove_type")
     replace_string <- remove_type
   } else{
     return(design_tbl)
