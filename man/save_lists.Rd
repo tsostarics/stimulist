@@ -9,7 +9,8 @@ save_lists(
   filename = design[["name"]],
   path = getwd(),
   separate_items = FALSE,
-  as_one_file = FALSE
+  as_one_file = FALSE,
+  remove_type = FALSE
 )
 }
 \arguments{
@@ -23,6 +24,11 @@ save_lists(
 items (eg critical and filler lists are saved separately)}
 
 \item{as_one_file}{Whether you want to save all trials as 1 file}
+
+\item{remove_type}{Should the type column be removed from the output file? If
+TRUE and there's only 1 type, the item column is renamed to the 1 value of the
+type column. If FALSE, type column is retained. If a string, will remove the
+type column and rename the item column to the given string.}
 }
 \description{
 Given a counterbalanced experiment from fill_experiment(), saves the individual

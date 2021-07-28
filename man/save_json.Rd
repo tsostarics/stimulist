@@ -10,7 +10,8 @@ save_json(
   objectname = "stimulist",
   extension = ".json",
   separate_items = FALSE,
-  as_one_file = FALSE
+  as_one_file = FALSE,
+  remove_type = FALSE
 )
 }
 \arguments{
@@ -25,6 +26,11 @@ save_json(
 \item{separate_items}{Should different item types be saved in separate files}
 
 \item{as_one_file}{Should all stimuli be saved as one file (NOT recommended)}
+
+\item{remove_type}{Should the type column be removed from the output file? If
+TRUE and there's only 1 type, the item column is renamed to the 1 value of the
+type column. If FALSE, type column is retained. If a string, will remove the
+type column and rename the item column to the given string.}
 }
 \description{
 This function does the same as save_lists, but in json format instead of

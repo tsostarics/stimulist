@@ -664,8 +664,9 @@ template_test <- new_design("Working with Templates") %>%
   add_items(critical = 12,
             filler = 8) %>%
   present_n_of(contour, 2) %>%
+  present_n_of(context, 2) %>% 
   add_stimuli_by(contour*context ~ audio_file,
-                 context ~ premable_text,
+                 context ~ preamble_text,
                  ~ center_audio) %>%
   counterbalance() %>%
   fill_experiment() %>%
@@ -674,7 +675,7 @@ template_test <- new_design("Working with Templates") %>%
                     as_levels = T)
 
 # Create template to fill out
-# tst %>% save_stimuli_templates()
+template_test %>% save_stimuli_templates()
 
 # Merge in our manual edits
 # tst %>%

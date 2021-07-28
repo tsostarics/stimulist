@@ -10,13 +10,18 @@
 #' items (eg critical and filler lists are saved separately)
 #' @param path Directory to save files into (default is getwd())
 #' @param as_one_file Whether you want to save all trials as 1 file
+#' @param remove_type Should the type column be removed from the output file? If
+#' TRUE and there's only 1 type, the item column is renamed to the 1 value of the
+#' type column. If FALSE, type column is retained. If a string, will remove the
+#' type column and rename the item column to the given string.
 #'
 #' @export
 save_lists <- function(design,
                        filename = design[["name"]],
                        path = getwd(),
                        separate_items = FALSE,
-                       as_one_file = FALSE) {
+                       as_one_file = FALSE,
+                       remove_type = FALSE) {
   # Error handling
   if (!"complete_experiment" %in% names(design)) {
     stop("Please use fill_experiment() before trying to save lists")
@@ -24,12 +29,13 @@ save_lists <- function(design,
   splits <- attr(design[['counterbalance']], "splits")
 
   if (as_one_file) {
-    write.csv(design[["complete_experiment"]],
+    output_table <- .remove_type_column(design[["complete_experiment"]], remove_type)
+    write.csv(output_table,
               "stimulus_list.csv",
               row.names = FALSE
     )
     message("Wrote 1 .csv file with all stimuli successfully.")
-    return(NULL)
+    return(invisible(NULL))
   }
 
   lists <- .split_stimulist(design[["complete_experiment"]], splits, separate_items)
@@ -48,7 +54,7 @@ save_lists <- function(design,
     )
   }
   message(paste0("Successfully wrote ", length(lists), " lists."))
-  NULL
+  return(invisible(NULL))
 }
 
 .make_path <- function(path, trial_type, filename, file_labels, i) {
@@ -56,13 +62,16 @@ save_lists <- function(design,
   paste0(path, trial_type, filename, "_", file_labels[i], ".csv")
 }
 
-.split_stimulist <- function(design_exp, splits, separate_items) {
+.split_stimulist <- function(design_exp, splits, separate_items, remove_type = FALSE) {
+  if (is.null(splits))
+    return(list(design_exp))
 
   groups <- "counterbalance"
   if (!is.null(splits))
     groups <- splits
   if (separate_items)
     groups <- c(groups, "type")
+  design_exp <- .remove_type_column(design_exp, remove_type)
 
   lists <-
     dplyr::group_split(
@@ -86,6 +95,22 @@ save_lists <- function(design,
 }
 
 
+.remove_type_column <- function(design_tbl, remove_type = FALSE){
+  if (remove_type == TRUE) {
+    if (length(unique(design_tbl[['type']])) > 1)
+      stop("Number of types is greater than one, must specify column name as string")
+    replace_string <- design_tbl[['type']][[1L]]
+  } else if (is.character(remove_type)) {
+    replace_string <- remove_type
+  } else{
+    return(design_tbl)
+  }
+
+  which_items <- names(design_tbl) == "item"
+  names(design_tbl)[which_items] <- replace_string
+  design_tbl['type'] <- NULL
+  design_tbl
+}
 
 
 

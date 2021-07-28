@@ -17,6 +17,10 @@
 #' @param separate_items Should different item types be saved in separate files
 #' @param as_one_file Should all stimuli be saved as one file (NOT recommended)
 #' @param extension File extension, defaults to .js
+#' @param remove_type Should the type column be removed from the output file? If
+#' TRUE and there's only 1 type, the item column is renamed to the 1 value of the
+#' type column. If FALSE, type column is retained. If a string, will remove the
+#' type column and rename the item column to the given string.
 #'
 #' @export
 save_json <- function(design,
@@ -24,7 +28,8 @@ save_json <- function(design,
                       objectname = "stimulist",
                       extension = ".json",
                       separate_items = FALSE,
-                      as_one_file = FALSE) {
+                      as_one_file = FALSE,
+                      remove_type = FALSE) {
   requireNamespace("jsonlite", quietly = TRUE)
   counterbalanced <- "counterbalance" %in% names(design[["complete_experiment"]])
 
@@ -32,9 +37,9 @@ save_json <- function(design,
   nested_df <- .nest_columns(design[["complete_experiment"]], nested_cols)
 
   if (!counterbalanced | as_one_file) {
-    .save_json_list(nested_df, filename, objectname, extension)
+    .save_json_list(nested_df, filename, objectname, extension, remove_type)
     message(paste0("Successfully wrote 1 ", extension, " file."))
-    invisible(NULL)
+    return(invisible(NULL))
   }
 
   # Split the individual trial lists up
@@ -45,22 +50,26 @@ save_json <- function(design,
 
   for (i in seq_len(n_lists)) {
     current_type <- ifelse(separate_items, lists[[i]][["type"]][[1L]], "")
+    current_type <- ifelse(current_type == "", "", paste0(current_type, "_"))
     file_label <- file_labels[[i]]
-    out_file <- paste0(filename, "_", current_type, "_", file_label, extension)
+    out_file <- paste0(filename, "_", current_type, file_label, extension)
 
     .save_json_list(lists[[i]],
                     filename = out_file,
                     objectname = paste(objectname, current_type, file_label, sep = "_"),
-                    extension
+                    extension,
+                    remove_type = FALSE
     )
   }
 
   message(paste0("Successfully wrote ", n_lists, " ", extension, " files."))
-  invisible(NULL)
+  return(invisible(NULL))
 }
 
-.save_json_list <- function(list_df, filename, objectname, extension) {
+.save_json_list <- function(list_df, filename, objectname, extension, remove_type) {
+  list_df <- .remove_type_column(list_df, remove_type)
   json_data <- jsonlite::toJSON(list_df, auto_unbox = TRUE, pretty = TRUE)
+  filename <- paste0(filename, extension)
   fileConn <- file(filename, "w") # Must denote w or append won't work
   to_append = TRUE
   if (extension == ".js") {
@@ -96,6 +105,8 @@ save_json <- function(design,
 .nest_columns <- function(full_table, group_cols) {
   # Takes columns like audio_1 and audio_2 and combines them into a
   # list column called audio. Allows us to export an embedded js object.
+  if (identical(character(0), group_cols))
+    return(full_table) # handles case where there's no fancy nesting
   nested_dfs <-
     lapply(
       group_cols,
