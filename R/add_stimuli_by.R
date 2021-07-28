@@ -10,7 +10,7 @@ add_stimuli_by <- function(design, ...) {
   formulas <- .clean_formulas(lapply(enexprs(...), as.character))
   .check_if_contains(design, formulas)
   for (stimset in formulas) {
-    if (length(stimset) == 2) {
+    if (length(stimset) == 2L) {
       design <- .add_constant_manipulation(design, stimset)
     } else {
       design <- .add_varying_manipulation(design, stimset)
@@ -56,11 +56,11 @@ add_stimuli_by <- function(design, ...) {
 .check_if_contains <- function(design, formulas){
   # Only need to check 2 sided formulas
   formulas <- formulas[vapply(formulas, length, 1L) == 3L]
-  manipulations <- unlist(lapply(formulas, function(x) stringr::str_extract_all(x[[2]], "[^* ]+")[[1]]))
+  manipulations <- unlist(lapply(formulas, function(x) stringr::str_extract_all(x[[2]], "[^* ]+")[[1L]]))
 
   is_in_manipulations <- manipulations %in% names(design[["manipulations"]])
   if (!all(is_in_manipulations))
-    stop(paste0(paste0(manipulations[!is_in_manipulations], collapse=", "), " not found in manipulations"))
+    stop(paste0(paste0(manipulations[!is_in_manipulations], collapse = ", "), " not found in manipulations"))
 }
 
 .set_stimuli_printmsg <- function(design) {
@@ -75,11 +75,12 @@ add_stimuli_by <- function(design, ...) {
 
 .set_stimulus_printmsg <- function(design, stimulus, to_add, is_crossed = FALSE) {
   if (stimulus == "item_constants") {
-    new_printmsg <- paste0(glue::glue("  1 of {to_add}, which only varies by trial.\n",.trim = FALSE),collapse="")
+    new_printmsg <- paste0(glue::glue("  1 of {to_add}, which only varies by trial.\n",.trim = FALSE),
+                           collapse = "")
   }
   else {
     stimstring <- gsub(" x ", " and ", stimulus)
-    lookup <- strsplit(stimulus, " x ")[[1]]
+    lookup <- strsplit(stimulus, " x ")[[1L]]
     which_ordered <- vapply(lookup,
                             function(x) attr(design[["manipulations"]][[x]], "has_order"),
                             TRUE)
@@ -89,7 +90,8 @@ add_stimuli_by <- function(design, ...) {
     )
     )
 
-    new_printmsg <- paste0(glue::glue("  {n} of {to_add}, which varies by {stimstring}.\n",.trim = FALSE),collapse="")
+    new_printmsg <- paste0(glue::glue("  {n} of {to_add}, which varies by {stimstring}.\n",.trim = FALSE),
+                           collapse = "")
   }
   attr(design[["stimuli"]][[stimulus]], "printmsg") <- new_printmsg
   # print(glue::glue("stimulus   {new_printmsg}"))
