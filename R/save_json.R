@@ -43,6 +43,7 @@ save_json <- function(design,
   }
 
   # Split the individual trial lists up
+  design <- split_lists_by(design, 'counterbalance') # when did I do this..?
   splits <- attr(design[['counterbalance']], "splits")
   lists <- .split_stimulist(nested_df, splits, separate_items)
   n_lists <- length(lists)
@@ -52,7 +53,7 @@ save_json <- function(design,
     current_type <- ifelse(separate_items, lists[[i]][["type"]][[1L]], "")
     current_type <- ifelse(current_type == "", "", paste0(current_type, "_"))
     file_label <- file_labels[[i]]
-    out_file <- paste0(filename, "_", current_type, file_label, extension)
+    out_file <- paste0(filename, "_", current_type, file_label)
 
     .save_json_list(lists[[i]],
                     filename = out_file,
