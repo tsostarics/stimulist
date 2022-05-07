@@ -26,9 +26,13 @@ save_lists <- function(design,
   if (!"complete_experiment" %in% names(design)) {
     stop("Please use fill_experiment() before trying to save lists")
   }
-  splits <- attr(design[['counterbalance']], "splits")
 
-  if (as_one_file) {
+  counterbalanced <- "counterbalance" %in% names(design[["complete_experiment"]])
+
+  nested_cols <- .get_nested_cols(design)
+  nested_df <- .nest_columns(design[["complete_experiment"]], nested_cols)
+
+  if (!counterbalanced | as_one_file) {
     output_table <- .remove_type_column(design[["complete_experiment"]], remove_type)
     write.csv(output_table,
               "stimulus_list.csv",
@@ -38,6 +42,8 @@ save_lists <- function(design,
     return(invisible(NULL))
   }
 
+  design <- split_lists_by(design, 'counterbalance') # when did I do this..?
+  splits <- attr(design[['counterbalance']], "splits")
   lists <- .split_stimulist(design[["complete_experiment"]], splits, separate_items)
   n_lists <- length(lists)
   file_labels <- .get_file_labels(design, n_lists, separate_items)
